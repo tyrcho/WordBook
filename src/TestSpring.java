@@ -1,3 +1,6 @@
+import info.daviot.gui.component.JScrollPane;
+import info.daviot.gui.component.SelectCategoriesPanel;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -5,8 +8,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import com.sun.java.util.SpringUtilities;
-import com.tyrcho.gui.component.JScrollPane;
-import com.tyrcho.gui.component.SelectCategoriesPanel;
 
 public class TestSpring {
 
