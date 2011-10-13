@@ -36,7 +36,7 @@ public class VocabularyTestFrame extends JFrame {
 		super(title);
 		this.session = session;
 		console = new ConsolePanel();
-		console.setFont(DictionaryConstants.FONT);
+		console.setFont(DictionaryConstants.FONT());
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(console.getPanel(), BorderLayout.CENTER);
 	}

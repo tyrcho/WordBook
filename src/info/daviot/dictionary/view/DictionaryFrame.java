@@ -671,7 +671,7 @@ public class DictionaryFrame extends JFrame {
 		topBox.add(new JLabel("Rechercher "));
 		topBox.add(searchField);
 		panel.add(topBox, BorderLayout.NORTH);
-		wordsList.setFont(DictionaryConstants.FONT);
+		wordsList.setFont(DictionaryConstants.FONT());
 		panel.add(new JScrollPane((Component) wordsList), BorderLayout.CENTER);
 		Map<String, String> languages = new HashMap<String, String>();
 		languages.put(firstLanguageName, firstLanguageName);
