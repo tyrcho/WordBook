@@ -713,8 +713,8 @@ public class DictionaryFrame extends JFrame {
 	}
 
 	private void updateList() {
-		List<String> listData = dictionary
-				.getSortedEntries(firstLanguageSelected);
+		List<String> listData = new ArrayList<String>(
+				dictionary.getSortedEntries(firstLanguageSelected));
 		String searchFilter = searchField.getText().trim();
 		if (searchFilter.length() > 0) {
 			searchFilter = ".*" + searchFilter + ".*";
