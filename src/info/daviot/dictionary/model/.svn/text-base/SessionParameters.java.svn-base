@@ -24,7 +24,7 @@ public class SessionParameters {
 		return badPercent;
 	}
 
-	public TwoWayDictionary getDictionary() {
+	public TwoWayDictionary dictionnary {
 		return dictionary;
 	}
 
@@ -32,7 +32,7 @@ public class SessionParameters {
 		return ignoredChars;
 	}
 
-	public int getQuestionCount() {
+	public int questionCount() {
 		return questionCount;
 	}
 
@@ -44,7 +44,7 @@ public class SessionParameters {
 		return recentPercent;
 	}
 
-	public boolean isFirstLanguage() {
+	public boolean firstLanguage {
 		return firstLanguage;
 	}
 

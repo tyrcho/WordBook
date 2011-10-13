@@ -19,8 +19,8 @@ class Session(val parameters: SessionParameters) {
   var entries: List[String] = _;
 
   def resetQuestions() {
-    val dictEntries = parameters.getDictionary().getEntries(parameters.isFirstLanguage());
-    questionCount = Math.min(dictEntries.size(), parameters.getQuestionCount());
+    val dictEntries = parameters.dictionnary.getEntries(parameters.firstLanguage);
+    questionCount = Math.min(dictEntries.size(), parameters.questionCount);
     entries = new ArrayList[String](questionCount);
     val random = new ArrayList[String](dictEntries);
     Collections.shuffle(random);
@@ -29,7 +29,7 @@ class Session(val parameters: SessionParameters) {
     val rand = new Random();
     for (i <- 0 until questionCount) {
       val r = rand.nextInt(100);
-      val list = if (r < parameters.getRandomPercent()) random else badRatio
+      val list = if (r < parameters.randomPercent) random else badRatio
       addEntry(entries, list);
     }
 
@@ -51,8 +51,8 @@ class Session(val parameters: SessionParameters) {
   def averageRating(): Float = {
     var total = 0f;
     var count = 0f;
-    for (string <- parameters.getDictionary().getEntries(parameters.isFirstLanguage())) {
-      total += parameters.getDictionary().getEntry(string, parameters.isFirstLanguage()).getRating();
+    for (string <- parameters.dictionnary.getEntries(parameters.firstLanguage)) {
+      total += parameters.dictionnary.getEntry(string, parameters.firstLanguage).getRating();
       count += 1;
     }
     return total / count;
@@ -70,8 +70,8 @@ class Session(val parameters: SessionParameters) {
   def buildRecentComparator() =
     new Comparator[String]() {
       def compare(s1: String, s2: String) = {
-        val entry1 = parameters.getDictionary().getEntry(s1, parameters.isFirstLanguage());
-        val entry2 = parameters.getDictionary().getEntry(s2, parameters.isFirstLanguage());
+        val entry1 = parameters.dictionnary.getEntry(s1, parameters.firstLanguage);
+        val entry2 = parameters.dictionnary.getEntry(s2, parameters.firstLanguage);
         entry1.getTotalAnswers() - entry2.getTotalAnswers();
       }
     };
@@ -79,16 +79,16 @@ class Session(val parameters: SessionParameters) {
   def buildRatingComparator() =
     new Comparator[String]() {
       def compare(s1: String, s2: String): Int = {
-        val entry1 = parameters.getDictionary().getEntry(s1, parameters.isFirstLanguage());
-        val entry2 = parameters.getDictionary().getEntry(s2, parameters.isFirstLanguage());
+        val entry1 = parameters.dictionnary.getEntry(s1, parameters.firstLanguage);
+        val entry2 = parameters.dictionnary.getEntry(s2, parameters.firstLanguage);
         ((entry1.getRating() - entry2.getRating()) * 100000).intValue()
       }
     };
   def buildBadRatioComparator() =
     new Comparator[String]() {
       def compare(s1: String, s2: String) = {
-        val entry1 = parameters.getDictionary().getEntry(s1, parameters.isFirstLanguage());
-        val entry2 = parameters.getDictionary().getEntry(s2, parameters.isFirstLanguage());
+        val entry1 = parameters.dictionnary.getEntry(s1, parameters.firstLanguage);
+        val entry2 = parameters.dictionnary.getEntry(s2, parameters.firstLanguage);
         val ratio1 = entry1.getGoodAnswerProportion();
         val ratio2 = entry2.getGoodAnswerProportion();
         val ratioDifference = ratio1 - ratio2;
@@ -96,18 +96,18 @@ class Session(val parameters: SessionParameters) {
       }
     };
 
-  def getPossibleConfusion(enteredString: String) = parameters.getDictionary().getEntry(enteredString, !parameters.isFirstLanguage());
+  def getPossibleConfusion(enteredString: String) = parameters.dictionnary.getEntry(enteredString, !parameters.firstLanguage);
 
   def switchLanguage() {
     val newEntries = new HashSet[String]();
     for (word <- entries) {
-      newEntries.addAll(parameters.getDictionary().getEntry(word,
-        parameters.isFirstLanguage()).translations);
+      newEntries.addAll(parameters.dictionnary.getEntry(word,
+        parameters.firstLanguage).translations);
     }
     entries = new ArrayList[String](newEntries);
     Collections.shuffle(entries);
     questionCount = entries.size();
-    parameters.setFirstLanguage(!parameters.isFirstLanguage());
+    parameters.firstLanguage = !parameters.firstLanguage;
   }
 
   def updateScore() { score = score + 1; }
@@ -127,8 +127,8 @@ class Session(val parameters: SessionParameters) {
 
     def next() = {
       val word = iterator.next();
-      new Question(word, parameters.getDictionary().getEntry(word,
-        parameters.isFirstLanguage()), parameters.getIgnoredChars());
+      new Question(word, parameters.dictionnary.getEntry(word,
+        parameters.firstLanguage), parameters.ignoredChars);
     }
 
     def remove() {

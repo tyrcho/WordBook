@@ -18,9 +18,9 @@ public class Session {
 	private List<String> entries;
 
 	public void resetQuestions() {
-		Set<String> dictEntries = parameters.getDictionary().getEntries(
-				parameters.isFirstLanguage());
-		questionCount = Math.min(dictEntries.size(), parameters.getQuestionCount());
+		Set<String> dictEntries = parameters.dictionnary.getEntries(
+				parameters.firstLanguage);
+		questionCount = Math.min(dictEntries.size(), parameters.questionCount());
 		entries = new ArrayList<String>(questionCount);
 		List<String> random = new ArrayList<String>(dictEntries);
 		Collections.shuffle(random);
@@ -71,10 +71,10 @@ public class Session {
 	public Comparator<String> buildRecentComparator() {
 		return new Comparator<String>() {
 			public int compare(String s1, String s2) {
-				DictionaryEntry entry1 = parameters.getDictionary().getEntry(
-						s1, parameters.isFirstLanguage());
-				DictionaryEntry entry2 = parameters.getDictionary().getEntry(
-						s2, parameters.isFirstLanguage());
+				DictionaryEntry entry1 = parameters.dictionnary.getEntry(
+						s1, parameters.firstLanguage);
+				DictionaryEntry entry2 = parameters.dictionnary.getEntry(
+						s2, parameters.firstLanguage);
 				return entry1.getTotalAnswers() - entry2.getTotalAnswers();
 			}
 		};
@@ -83,10 +83,10 @@ public class Session {
 	public Comparator<String> buildBadRatioComparator() {
 		return new Comparator<String>() {
 			public int compare(String s1, String s2) {
-				DictionaryEntry entry1 = parameters.getDictionary().getEntry(
-						s1, parameters.isFirstLanguage());
-				DictionaryEntry entry2 = parameters.getDictionary().getEntry(
-						s2, parameters.isFirstLanguage());
+				DictionaryEntry entry1 = parameters.dictionnary.getEntry(
+						s1, parameters.firstLanguage);
+				DictionaryEntry entry2 = parameters.dictionnary.getEntry(
+						s2, parameters.firstLanguage);
 				float ratio1 = entry1.getGoodAnswerProportion();
 				float ratio2 = entry2.getGoodAnswerProportion();
 				float ratioDifference = ratio1 - ratio2;
@@ -103,16 +103,16 @@ public class Session {
 	public void switchLanguage() {
 		Set<String> newEntries = new HashSet<String>();
 		for (String word : entries) {
-			newEntries.addAll(parameters.getDictionary().getEntry(word,
-					parameters.isFirstLanguage()).getTranslations());
+			newEntries.addAll(parameters.dictionnary.getEntry(word,
+					parameters.firstLanguage).getTranslations());
 		}
 		entries = new ArrayList<String>(newEntries);
 		Collections.shuffle(entries);
 		questionCount = entries.size();
-		parameters.setFirstLanguage(!parameters.isFirstLanguage());
+		parameters.setFirstLanguage(!parameters.firstLanguage);
 	}
 
-	// Mise à jour du score de la session
+	// Mise ï¿½ jour du score de la session
 	public void updateScore() {
 		score = score + 1;
 	}
@@ -121,12 +121,12 @@ public class Session {
 		score = 0;
 	}
 
-	// Récupération du score de la session
+	// Rï¿½cupï¿½ration du score de la session
 	public String getScore() {
 		return score + "/" + questionCount;
 	}
 
-	// Récupération de l'itérateur de la session
+	// Rï¿½cupï¿½ration de l'itï¿½rateur de la session
 	public Iterator<Question> iterator() {
 		return new SessionIterator();
 	}
@@ -144,8 +144,8 @@ public class Session {
 
 		public Question next() {
 			String word = iterator.next();
-			return new Question(word, parameters.getDictionary().getEntry(word,
-					parameters.isFirstLanguage()), parameters.getIgnoredChars());
+			return new Question(word, parameters.dictionnary.getEntry(word,
+					parameters.firstLanguage), parameters.getIgnoredChars());
 		}
 
 		public void remove() {

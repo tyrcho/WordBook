@@ -72,7 +72,7 @@ public class VocabularyTestFrame extends JFrame {
 
     private void questionAnswered(String answer) {
         currentQuestion.setInputTranslation(answer);
-        DictionaryEntry dictionaryEntry = currentQuestion.getDictionaryEntry();
+        DictionaryEntry dictionaryEntry = currentQuestion.dictionnaryEntry();
         if (currentQuestion.isAnswerValid()) {
             session.updateScore();
             dictionaryEntry.incrementGoodAnswers();

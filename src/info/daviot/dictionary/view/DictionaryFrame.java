@@ -185,7 +185,7 @@ public class DictionaryFrame extends JFrame {
 				.showSessionParametersDialog(this,
 						"Choisir la configuration de l'exercice", dictionary);
 		if (parameters != null) {
-			parameters.setIgnoredChars(ignoredChars);
+			parameters.ignoredChars_$eq(ignoredChars);
 			Session session = new Session(parameters);
 			runSession(session);
 			setModified(true);
@@ -274,7 +274,7 @@ public class DictionaryFrame extends JFrame {
 					e1.printStackTrace();
 				}
 				// String otherChangeLanguage= "Autre exercice
-				// ("+(session.isFirstLanguage()?secondLanguageName:firstLanguageName)+")";
+				// ("+(session.firstLanguage?secondLanguageName:firstLanguageName)+")";
 				String[] options = { "Recommencer (m�mes mots)",
 						"Autre exercice", "Changer de langue ", "Retour",
 						"M�me type d'exercice" };
