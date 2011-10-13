@@ -4,5 +4,12 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="D:/dev/java/lib/xstream-1.1.2.jar"/>
+	<classpathentry kind="lib" path="D:/dev/java/lib/jasper/commons-beanutils-1.8.0.jar"/>
+	<classpathentry kind="lib" path="D:/dev/java/lib/jasper/commons-collections-2.1.1.jar"/>
+	<classpathentry kind="lib" path="D:/dev/java/lib/jasper/commons-digester-1.7.jar"/>
+	<classpathentry kind="lib" path="D:/dev/java/lib/jasper/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="D:/dev/java/lib/jasper/jasperreports-3.7.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
