@@ -28,8 +28,8 @@ public class SessionParametersPanel extends JPanel {
 	private RadioButtonGroup languageButtonGroup;
 	private TextFieldWithSlider questionCountField;
 	private TextFieldWithSlider randomCountField;
-//	private TextFieldWithSlider badCountField;
-//	private TextFieldWithSlider recentCountField;
+	// private TextFieldWithSlider badCountField;
+	// private TextFieldWithSlider recentCountField;
 	private TwoWayDictionary dictionary;
 	protected boolean isUpdating;
 	private static SessionParametersPanel panel;
@@ -42,8 +42,8 @@ public class SessionParametersPanel extends JPanel {
 	private void init() {
 		setLayout(new BorderLayout());
 		Map<String, Boolean> languages = new HashMap<String, Boolean>();
-		languages.put(dictionary.getFirstLanguage(), true);
-		languages.put(dictionary.getSecondLanguage(), false);
+		languages.put(dictionary.firstLanguage(), true);
+		languages.put(dictionary.secondLanguage(), false);
 		languageButtonGroup = new RadioButtonGroup(RadioButtonGroup.VERTICAL,
 				languages);
 		languageButtonGroup.setCurrentValue(Boolean.FALSE);
@@ -89,8 +89,8 @@ public class SessionParametersPanel extends JPanel {
 								second.setValue(second.getValue() - diff2);
 							}
 						} else if (total < 100) {
-							int diff1 = Math.min(100 - total, 100 - first
-									.getValue());
+							int diff1 = Math.min(100 - total,
+									100 - first.getValue());
 							first.setValue(first.getValue() + diff1);
 							int diff2 = 100 - total - diff1;
 							if (diff2 > 0) {
@@ -104,9 +104,10 @@ public class SessionParametersPanel extends JPanel {
 	}
 
 	public SessionParameters getSessionParameters() {
-		return new SessionParameters(dictionary, ((Boolean) languageButtonGroup
-				.getCurrentValue()).booleanValue(), questionCountField
-				.getValue(), randomCountField.getValue());
+		return new SessionParameters(dictionary,
+				((Boolean) languageButtonGroup.getCurrentValue())
+						.booleanValue(), questionCountField.getValue(),
+				randomCountField.getValue());
 	}
 
 	public static SessionParameters showSessionParametersDialog(JFrame frame,

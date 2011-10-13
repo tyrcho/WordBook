@@ -341,8 +341,8 @@ public class DictionaryFrame extends JFrame {
 	}
 
 	private void updateFrame(File file, TwoWayDictionary dictionary) {
-		DictionaryFrame frame = new DictionaryFrame(
-				dictionary.getFirstLanguage(), dictionary.getSecondLanguage());
+		DictionaryFrame frame = new DictionaryFrame(dictionary.firstLanguage(),
+				dictionary.secondLanguage());
 		frame.dictionary = dictionary;
 		frame.ignoredChars = ignoredChars;
 		frame.setCurrentFile(file);
