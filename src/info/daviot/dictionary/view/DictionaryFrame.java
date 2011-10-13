@@ -8,7 +8,6 @@ import info.daviot.dictionary.model.SessionCompleteListener;
 import info.daviot.dictionary.model.SessionParameters;
 import info.daviot.dictionary.model.TwoWayDictionary;
 import info.daviot.dictionary.model.factory.DictionnaryFactory;
-import info.daviot.dictionary.model.factory.DictionnaryFactoryException;
 import info.daviot.dictionary.model.factory.XstreamDictionaryFactory;
 import info.daviot.gui.component.ErrorMessageDialog;
 import info.daviot.gui.toolkit.RadioButtonGroup;
@@ -356,7 +355,7 @@ public class DictionaryFrame extends JFrame {
 
 	private void load(File file) {
 		try {
-			factory.setFileName(file.getAbsolutePath());
+			factory.fileName_$eq(file.getAbsolutePath());
 			dictionary = factory.load();
 			updateFrame(file, dictionary);
 		} catch (RuntimeException e) {
@@ -364,7 +363,7 @@ public class DictionaryFrame extends JFrame {
 					"Ce fichier n'a pas pu �tre lu " + file.getAbsolutePath(),
 					e).setVisible(true);
 			updateFrame(file, new TwoWayDictionary("", ""));
-		} catch (DictionnaryFactoryException e) {
+		} catch (Exception e) {
 			new ErrorMessageDialog(this, "Fichier non valide",
 					"Ce fichier n'a pas pu �tre lu " + file.getAbsolutePath(),
 					e).setVisible(true);
@@ -374,7 +373,7 @@ public class DictionaryFrame extends JFrame {
 
 	private void importFile(File file) {
 		try {
-			factory.setFileName(file.getAbsolutePath());
+			factory.fileName_$eq(file.getAbsolutePath());
 			TwoWayDictionary imported = factory.load();
 			modified = true;
 			dictionary.addAll(imported);
@@ -383,7 +382,7 @@ public class DictionaryFrame extends JFrame {
 			new ErrorMessageDialog(this, "Fichier non valide",
 					"Ce fichier n'a pas pu �tre lu " + file.getAbsolutePath(),
 					e).setVisible(true);
-		} catch (DictionnaryFactoryException e) {
+		} catch (Exception e) {
 			new ErrorMessageDialog(this, "Fichier non valide",
 					"Ce fichier n'a pas pu �tre lu " + file.getAbsolutePath(),
 					e).setVisible(true);
@@ -461,7 +460,7 @@ public class DictionaryFrame extends JFrame {
 
 	private boolean save(File file) {
 		try {
-			factory.setFileName(file.getAbsolutePath());
+			factory.fileName_$eq(file.getAbsolutePath());
 			factory.save(dictionary);
 			saveAction.setEnabled(true);
 			setModified(false);
@@ -470,7 +469,7 @@ public class DictionaryFrame extends JFrame {
 					"Le fichier " + file.getAbsolutePath()
 							+ " a �t� enregistr�.");
 			return true;
-		} catch (DictionnaryFactoryException e) {
+		} catch (Exception e) {
 			showSaveError(file, e);
 			return false;
 		}
