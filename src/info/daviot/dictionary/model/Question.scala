@@ -9,7 +9,7 @@ class Question(val word: String, val dictionaryEntry: DictionaryEntry, ignoredCh
 
   override def toString() = "Donnez la traduction de : " + word
 
-  def isAnswerValid() = dictionaryEntry.getTranslations().exists(Utils.simpleCompare(_, inputTranslation, ignoredChars))
+  def isAnswerValid() = dictionaryEntry.translations.exists(Utils.simpleCompare(_, inputTranslation, ignoredChars))
 
-  def getTranslation() = dictionaryEntry.getTranslations().toString()
+  def getTranslation() = dictionaryEntry.translations.toString()
 }

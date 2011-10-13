@@ -2,15 +2,13 @@ package info.daviot.dictionary.model;
 
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class TwoWayDictionary {
 	private String firstLanguage = "";
@@ -54,11 +52,11 @@ public class TwoWayDictionary {
 		if (word != null) {
 			DictionaryEntry firstEntry = secondLanguageIndexedByFirst.get(word);
 			if (firstEntry != null) {
-				for (String translatedWord : firstEntry.getTranslations()) {
+				for (String translatedWord : firstEntry.translations()) {
 					DictionaryEntry secondEntry = firstLanguageIndexedBySecond
 							.get(translatedWord);
 					secondEntry.removeTranslation(word);
-					if (secondEntry.getTranslations().size() == 0) {
+					if (secondEntry.translations().size() == 0) {
 						firstLanguageIndexedBySecond.remove(translatedWord);
 					}
 				}
@@ -112,7 +110,7 @@ public class TwoWayDictionary {
 		DictionaryEntry languageEntry = languageMap.get(languageWord);
 		if (languageEntry == null)
 			languageEntry = new DictionaryEntry();
-		languageEntry.setExplaination(explanation);
+		languageEntry.explaination_$eq(explanation);
 		languageMap.put(languageWord, languageEntry);
 	}
 
@@ -133,21 +131,22 @@ public class TwoWayDictionary {
 		return firstLanguage ? getFirstLanguageEntries()
 				: getSecondLanguageEntries();
 	}
-	
+
 	public List<String> getSortedEntries(boolean firstLanguage) {
-		if(firstCollator==null || secondCollator==null) {
+		if (firstCollator == null || secondCollator == null) {
 			defineCollators();
 		}
-		Collator c=firstLanguage?firstCollator:secondCollator;
-		ArrayList<String> entries = new ArrayList<String>(getEntries(firstLanguage));
+		Collator c = firstLanguage ? firstCollator : secondCollator;
+		ArrayList<String> entries = new ArrayList<String>(
+				getEntries(firstLanguage));
 		Collections.sort(entries, c);
 		return entries;
 	}
 
 	private void defineCollators() {
-		firstCollator=Collator.getInstance(new Locale(firstLanguage));
-		secondCollator=Collator.getInstance(new Locale(secondLanguage));
-		
+		firstCollator = Collator.getInstance(new Locale(firstLanguage));
+		secondCollator = Collator.getInstance(new Locale(secondLanguage));
+
 	}
 
 	public Set<String> getFirstLanguageEntries() {
@@ -203,12 +202,12 @@ public class TwoWayDictionary {
 				targetMap.put(key, dictionaryEntry);
 			}
 			DictionaryEntry importedDictionaryEntry = entry.getValue();
-			for (String t : importedDictionaryEntry.getTranslations()) {
+			for (String t : importedDictionaryEntry.translations()) {
 				dictionaryEntry.addTranslation(t);
 			}
-			String explaination = importedDictionaryEntry.getExplaination();
+			String explaination = importedDictionaryEntry.explaination();
 			if (explaination != null) {
-				dictionaryEntry.setExplaination(explaination);
+				dictionaryEntry.explaination_$eq(explaination);
 			}
 		}
 	}

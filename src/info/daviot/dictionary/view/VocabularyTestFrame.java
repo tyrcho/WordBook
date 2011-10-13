@@ -76,9 +76,9 @@ public class VocabularyTestFrame extends JFrame {
 		if (currentQuestion.isAnswerValid()) {
 			session.updateScore();
 			dictionaryEntry.incrementGoodAnswers();
-			dictionaryEntry.setRating(session.newRating(
+			dictionaryEntry.rating_$eq(session.newRating(
 					dictionaryEntry.getRating(), true));
-			// int goodAnswers = dictionaryEntry.getGoodAnswers();
+			// int goodAnswers = dictionaryEntry.goodAnswers();
 			String score = dictionaryEntry.displayRating();
 			// "("+goodAnswers+"/"+(goodAnswers+dictionaryEntry.getWrongAnswers())+")";
 			console.println("Bravo " + score);
@@ -87,18 +87,18 @@ public class VocabularyTestFrame extends JFrame {
 					.getPossibleConfusion(answer.trim());
 			if (possibleConfusion != null) {
 				console.println(String.format("*** %s == %s (%s)***", answer,
-						possibleConfusion.getFirstTranslation(),
-						possibleConfusion.getExplaination()));
+						possibleConfusion.firstTranslation(),
+						possibleConfusion.explaination()));
 				possibleConfusion.incrementWrongAnswers();
-				possibleConfusion.setRating(session.newRating(
+				possibleConfusion.rating_$eq(session.newRating(
 						possibleConfusion.getRating(), false));
 
 			}
-			int translations = dictionaryEntry.getTranslations().size();
+			int translations = dictionaryEntry.translations().size();
 			dictionaryEntry.incrementWrongAnswers();
-			dictionaryEntry.setRating(session.newRating(
+			dictionaryEntry.rating_$eq(session.newRating(
 					dictionaryEntry.getRating(), false));
-			// int goodAnswers = dictionaryEntry.getGoodAnswers();
+			// int goodAnswers = dictionaryEntry.goodAnswers();
 			// String
 			// score="("+goodAnswers+"/"+(goodAnswers+dictionaryEntry.getWrongAnswers())+")";
 			String score = dictionaryEntry.displayRating();
@@ -108,11 +108,11 @@ public class VocabularyTestFrame extends JFrame {
 					+ " : "
 					+ currentQuestion.getTranslation();
 			errors.append(String.format("%s et non <%s> (%s)%n", message,
-					answer, dictionaryEntry.getExplaination()));
+					answer, dictionaryEntry.explaination()));
 			console.println("*** ERREUR *** " + score + ", " + message);
 
 		}
-		String example = dictionaryEntry.getExplaination();
+		String example = dictionaryEntry.explaination();
 		if (example != null && example.trim() != "") {
 			console.println(example);
 		}

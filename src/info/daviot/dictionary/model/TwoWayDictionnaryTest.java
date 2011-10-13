@@ -29,26 +29,26 @@ public class TwoWayDictionnaryTest extends TestCase {
     
     public void testFirstGetter()
     {
-        assertTrue(dictionnary.getFirstLanguageEntry(BONJOUR).getTranslations().contains(HELLO));
-        assertTrue(dictionnary.getFirstLanguageEntry(SALUT).getTranslations().contains(HELLO));
+        assertTrue(dictionnary.getFirstLanguageEntry(BONJOUR).translations().contains(HELLO));
+        assertTrue(dictionnary.getFirstLanguageEntry(SALUT).translations().contains(HELLO));
     }
 
     public void testSecondGetter()
     {
-        assertTrue(dictionnary.getSecondLanguageEntry(HELLO).getTranslations().contains(BONJOUR));
-        assertTrue(dictionnary.getSecondLanguageEntry(HELLO).getTranslations().contains(SALUT));
+        assertTrue(dictionnary.getSecondLanguageEntry(HELLO).translations().contains(BONJOUR));
+        assertTrue(dictionnary.getSecondLanguageEntry(HELLO).translations().contains(SALUT));
     }
     
     public void testExplaination() {
-        assertEquals(HELLO_WORLD, dictionnary.getSecondLanguageEntry(HELLO).getExplaination());
-        assertEquals(SALUT_A_TOUS, dictionnary.getFirstLanguageEntry(SALUT).getExplaination());
+        assertEquals(HELLO_WORLD, dictionnary.getSecondLanguageEntry(HELLO).explaination());
+        assertEquals(SALUT_A_TOUS, dictionnary.getFirstLanguageEntry(SALUT).explaination());
     }
     
     public void testRemove() {
         dictionnary.removeFirstLanguageWord(SALUT);
-        assertTrue(dictionnary.getFirstLanguageEntry(BONJOUR).getTranslations().contains(HELLO));
+        assertTrue(dictionnary.getFirstLanguageEntry(BONJOUR).translations().contains(HELLO));
         assertNull(dictionnary.getFirstLanguageEntry(SALUT));
-        assertTrue(dictionnary.getSecondLanguageEntry(HELLO).getTranslations().contains(BONJOUR));
-        assertFalse(dictionnary.getSecondLanguageEntry(HELLO).getTranslations().contains(SALUT));
+        assertTrue(dictionnary.getSecondLanguageEntry(HELLO).translations().contains(BONJOUR));
+        assertFalse(dictionnary.getSecondLanguageEntry(HELLO).translations().contains(SALUT));
     }
 }

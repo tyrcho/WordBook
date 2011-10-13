@@ -207,7 +207,7 @@ public class DictionaryFrame extends JFrame {
 					map.put("a", word);
 					DictionaryEntry entry = dictionary.getEntry(word,
 							firstLanguage);
-					Collection<String> translations = entry.getTranslations();
+					Collection<String> translations = entry.translations();
 					StringBuffer buffer = new StringBuffer();
 					for (Iterator<String> i = translations.iterator(); i
 							.hasNext();) {
@@ -217,7 +217,7 @@ public class DictionaryFrame extends JFrame {
 						}
 					}
 					map.put("b", buffer.toString());
-					map.put("c", entry.getExplaination());
+					map.put("c", entry.explaination());
 					data.add(map);
 				}
 				HashMap<String, String> parameters = new HashMap<String, String>();
@@ -418,7 +418,7 @@ public class DictionaryFrame extends JFrame {
 			for (String e : dictionary.getSortedEntries(firstLanguage)) {
 				fileWriter.append(e + ";");
 				DictionaryEntry entry = dictionary.getEntry(e, firstLanguage);
-				for (Iterator<String> i = entry.getTranslations().iterator(); i
+				for (Iterator<String> i = entry.translations().iterator(); i
 						.hasNext();) {
 					fileWriter.append(i.next());
 					if (i.hasNext()) {
@@ -426,8 +426,8 @@ public class DictionaryFrame extends JFrame {
 					}
 				}
 				fileWriter.append(String.format(";%s;%s/%s%n", entry
-						.getExplaination().replaceAll("\r|\n", ""), entry
-						.getGoodAnswers(), entry.getTotalAnswers()));
+						.explaination().replaceAll("\r|\n", ""), entry
+						.goodAnswers(), entry.getTotalAnswers()));
 			}
 			fileWriter.close();
 		} catch (IOException e) {

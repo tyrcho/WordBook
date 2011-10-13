@@ -128,7 +128,7 @@ public class Session {
 		Set<String> newEntries = new HashSet<String>();
 		for (String word : entries) {
 			newEntries.addAll(parameters.getDictionary().getEntry(word,
-					parameters.isFirstLanguage()).getTranslations());
+					parameters.isFirstLanguage()).translations());
 		}
 		entries = new ArrayList<String>(newEntries);
 		Collections.shuffle(entries);

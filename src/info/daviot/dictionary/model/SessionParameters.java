@@ -4,7 +4,7 @@ public class SessionParameters {
 	private TwoWayDictionary dictionary;
 	private boolean firstLanguage;
 	private int questionCount;
-	private String ignoredChars;
+	private String ignoredChars = "";
 	private int randomPercent;
 
 	public SessionParameters(TwoWayDictionary dictionary,

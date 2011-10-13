@@ -7,6 +7,7 @@ class UtilsTest {
   @Test
   def testSimpleCompare() {
     assertTrue(Utils.simpleCompare("a1z233e", "aze", "223 1"));
+    assertTrue(Utils.simpleCompare("aze", "aze", null));
     assertTrue(Utils.simpleCompare("a1z233e", "12a3ze22 ", "223 1"));
     assertFalse(Utils.simpleCompare("a1z233e", "12a3ze22 ", "3 1"));
     assertFalse(Utils.simpleCompare("a1z233e", "12a3ze22 ", ""));

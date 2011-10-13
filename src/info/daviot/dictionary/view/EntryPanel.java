@@ -117,12 +117,12 @@ public class EntryPanel extends JPanel {
     public void setDictionaryEntry(String selectedWord, DictionaryEntry entry) {
         wordTextField.setText(selectedWord);
         StringBuffer translations=new StringBuffer();
-        for (Iterator<String> i = entry.getTranslations().iterator(); i.hasNext();) {
+        for (Iterator<String> i = entry.translations().iterator(); i.hasNext();) {
             translations.append(i.next());
             if (i.hasNext()) translations.append(", ");                        
         }
         translationsTextField.setText(translations.toString());
-        explainationTextArea.setText(entry.getExplaination());
+        explainationTextArea.setText(entry.explaination());
         modified=false;
         previousWord=selectedWord;
     }
