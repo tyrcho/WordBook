@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,7 +69,6 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
 
-
 /**
  * @author ALEXIS
  */
@@ -82,8 +80,7 @@ public class DictionaryFrame extends JFrame {
 	public static final String EXTENSION = "dict";
 
 	public static final String propertiesFileName = System
-			.getProperty("user.home")
-			+ "/dict.properties";
+			.getProperty("user.home") + "/dict.properties";
 
 	private String firstLanguageName;
 
@@ -119,7 +116,7 @@ public class DictionaryFrame extends JFrame {
 			saveClicked();
 		}
 	};
-	
+
 	private Action exportAction = new AbstractAction("Exporter") {
 		public void actionPerformed(ActionEvent e) {
 			exportClicked();
@@ -174,7 +171,6 @@ public class DictionaryFrame extends JFrame {
 	private DictionnaryFactory factory = new XstreamDictionaryFactory();
 
 	private String ignoredChars;
-
 
 	public DictionaryFrame(String firstLanguageName, String secondLanguageName) {
 		dictionary = new TwoWayDictionary(firstLanguageName, secondLanguageName);
@@ -233,8 +229,8 @@ public class DictionaryFrame extends JFrame {
 						parameters, new JRMapCollectionDataSource(data));
 				JasperViewer.viewReport(print, false);
 			} catch (JRException e) {
-				JOptionPane.showMessageDialog(this, "Erreur Jasper Print"
-						+ e.getMessage());
+				JOptionPane.showMessageDialog(this,
+						"Erreur Jasper Print" + e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -279,8 +275,9 @@ public class DictionaryFrame extends JFrame {
 				}
 				// String otherChangeLanguage= "Autre exercice
 				// ("+(session.isFirstLanguage()?secondLanguageName:firstLanguageName)+")";
-				String[] options = { "Recommencer (m�mes mots)", "Autre exercice",
-						"Changer de langue ", "Retour" , "M�me type d'exercice" };
+				String[] options = { "Recommencer (m�mes mots)",
+						"Autre exercice", "Changer de langue ", "Retour",
+						"M�me type d'exercice" };
 				String message = "Votre score est de " + score + ".\n "
 						+ frame.getErrors() + "\nEt maintenant ?";
 				int choice = JOptionPane
@@ -344,8 +341,8 @@ public class DictionaryFrame extends JFrame {
 	}
 
 	private void updateFrame(File file, TwoWayDictionary dictionary) {
-		DictionaryFrame frame = new DictionaryFrame(dictionary
-				.getFirstLanguage(), dictionary.getSecondLanguage());
+		DictionaryFrame frame = new DictionaryFrame(
+				dictionary.getFirstLanguage(), dictionary.getSecondLanguage());
 		frame.dictionary = dictionary;
 		frame.ignoredChars = ignoredChars;
 		frame.setCurrentFile(file);
@@ -413,20 +410,24 @@ public class DictionaryFrame extends JFrame {
 			}
 		}
 	}
-	
+
 	private void export(File file, boolean firstLanguage) {
 		try {
-			Writer fileWriter = new OutputStreamWriter(new FileOutputStream(file), Charset.forName("UTF-8"));
+			Writer fileWriter = new OutputStreamWriter(new FileOutputStream(
+					file), Charset.forName("UTF-8"));
 			for (String e : dictionary.getSortedEntries(firstLanguage)) {
-				fileWriter.append(e+";");
+				fileWriter.append(e + ";");
 				DictionaryEntry entry = dictionary.getEntry(e, firstLanguage);
-				for(Iterator<String> i= entry.getTranslations().iterator();i.hasNext();) {
+				for (Iterator<String> i = entry.getTranslations().iterator(); i
+						.hasNext();) {
 					fileWriter.append(i.next());
 					if (i.hasNext()) {
 						fileWriter.append(",");
 					}
 				}
-				fileWriter.append(String.format(";%s;%s/%s%n", entry.getExplaination().replaceAll("\r|\n", ""), entry.getGoodAnswers(), entry.getTotalAnswers()));
+				fileWriter.append(String.format(";%s;%s/%s%n", entry
+						.getExplaination().replaceAll("\r|\n", ""), entry
+						.getGoodAnswers(), entry.getTotalAnswers()));
 			}
 			fileWriter.close();
 		} catch (IOException e) {
@@ -444,16 +445,15 @@ public class DictionaryFrame extends JFrame {
 			}
 			if (!file.exists()
 					|| JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-							this, "Ecraser le fichier "
-									+ file.getAbsolutePath(), "Ecraser ?",
-							JOptionPane.YES_NO_OPTION,
+							this,
+							"Ecraser le fichier " + file.getAbsolutePath(),
+							"Ecraser ?", JOptionPane.YES_NO_OPTION,
 							JOptionPane.QUESTION_MESSAGE)) {
 				return save(file);
 			}
 		}
 		return false;
 	}
-
 
 	private boolean saveClicked() {
 		return save(currentFile);
@@ -466,8 +466,9 @@ public class DictionaryFrame extends JFrame {
 			saveAction.setEnabled(true);
 			setModified(false);
 			updateStatus();
-			JOptionPane.showMessageDialog(this, "Le fichier "
-					+ file.getAbsolutePath() + " a �t� enregistr�.");
+			JOptionPane.showMessageDialog(this,
+					"Le fichier " + file.getAbsolutePath()
+							+ " a �t� enregistr�.");
 			return true;
 		} catch (DictionnaryFactoryException e) {
 			showSaveError(file, e);
@@ -476,9 +477,11 @@ public class DictionaryFrame extends JFrame {
 	}
 
 	private void showSaveError(File file, Exception e) {
-		new ErrorMessageDialog(this, "Impossible d'enregistrer",
-				"Impossible d'�crire dans le fichier "
-						+ file.getAbsolutePath(), e).setVisible(true);
+		new ErrorMessageDialog(
+				this,
+				"Impossible d'enregistrer",
+				"Impossible d'�crire dans le fichier " + file.getAbsolutePath(),
+				e).setVisible(true);
 	}
 
 	private void updateStatus() {
@@ -711,7 +714,8 @@ public class DictionaryFrame extends JFrame {
 	}
 
 	private void updateList() {
-		List<String> listData = dictionary.getSortedEntries(firstLanguageSelected);
+		List<String> listData = dictionary
+				.getSortedEntries(firstLanguageSelected);
 		String searchFilter = searchField.getText().trim();
 		if (searchFilter.length() > 0) {
 			searchFilter = ".*" + searchFilter + ".*";
@@ -736,13 +740,13 @@ public class DictionaryFrame extends JFrame {
 			InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		DictionaryFrame frame = new DictionaryFrame("Fran�ais", "Espa�ol");
+		DictionaryFrame frame = new DictionaryFrame("Français", "Español");
 		// frame.addEntry("hola", "salut, bonjour", "Hola se�or");
 		frame.pack();
 		try {
 			frame.load(new File(readPropertiesFile()));
 		} catch (IOException e) {
-			System.out.println("Premier d�marrage, le fichier "
+			System.out.println("Premier démarrage, le fichier "
 					+ propertiesFileName + " n'existe pas encore");
 			frame.setVisible(true);
 		}
@@ -816,18 +820,18 @@ public class DictionaryFrame extends JFrame {
 		if (!isSaved("Attention aux donn�es en cours",
 				"Sauver les donn�es en cours ?"))
 			return;
-		  
+
 		String firstLanguage = (String) JOptionPane.showInputDialog(this,
-				 "Premi�re langue ?", null, JOptionPane.INFORMATION_MESSAGE, null,
-			        Locale.getISOLanguages(), "fr");
+				"Premi�re langue ?", null, JOptionPane.INFORMATION_MESSAGE,
+				null, Locale.getISOLanguages(), "fr");
 		String secondLanguage = (String) JOptionPane.showInputDialog(this,
-				 "Deuxi�me langue ?", null, JOptionPane.INFORMATION_MESSAGE, null,
-			        Locale.getISOLanguages(), "en");
+				"Deuxi�me langue ?", null, JOptionPane.INFORMATION_MESSAGE,
+				null, Locale.getISOLanguages(), "en");
 		dictionary = new TwoWayDictionary(firstLanguage, secondLanguage);
 		updateFrame(null, dictionary);
 	}
 
-	private void showHelp()  {
+	private void showHelp() {
 		try {
 			Desktop.getDesktop().browse(new URI(HELP_PAGE));
 		} catch (Exception e) {
