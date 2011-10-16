@@ -627,7 +627,7 @@ public class DictionaryFrame extends JFrame {
 
 	private void listSelectionChanged(String selectedWord) {
 		if (selectedWord != null && selectedWord.length() > 0) {
-			if (entryPanel.isModified() && lastSelectedWord != null
+			if (entryPanel.modified() && lastSelectedWord != null
 					&& !selectedWord.equals(lastSelectedWord)) {
 				int response = JOptionPane.showConfirmDialog(this,
 						"Les donn�es ont �t� modifi�es",
