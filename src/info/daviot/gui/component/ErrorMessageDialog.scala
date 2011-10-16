@@ -13,7 +13,7 @@ import java.io.StringWriter;
 import javax.swing.Box;
 import javax.swing.JButton;
 
-class ErrorMessageDialog(frame: Frame, title: String, message: String, exception: Throwable) extends InformationDialog(frame, title) {
+class ErrorMessageDialog(frame: Frame, title: String, message: String, exception: Throwable = null) extends InformationDialog(frame, title) {
 
   override def setVisible(visible: Boolean) {
     super.setVisible(visible);

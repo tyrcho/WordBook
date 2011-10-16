@@ -7,16 +7,11 @@ import info.daviot.gui.component.JTextField;
 import info.daviot.gui.field.DefaultInputFieldGroup;
 import info.daviot.gui.field.IInputFieldGroup;
 import info.daviot.gui.field.ITextField;
-import info.daviot.util.validation.FailedValidationException;
-import info.daviot.util.validation.GroupValidator;
-import info.daviot.util.validation.NotEmptyValidator;
-import info.daviot.util.validation.PatternValidator;
+import info.daviot.util.validation._
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -39,22 +34,14 @@ class EntryPanel(frame: DictionaryFrame) extends JPanel {
 
   var modified = false
   var previousWord: String = _
-  var inputFieldsGroup: IInputFieldGroup = _
-  var fieldsValidator: GroupValidator = _
 
-  val inputFields = new HashMap[String, ITextField]();
   wordTextField.setFont(DictionaryConstants.FONT);
   translationsTextField.setFont(DictionaryConstants.FONT);
-  inputFields.put(WORD_FIELD, wordTextField);
-  inputFields.put(TRANSLATIONS_FIELD, translationsTextField);
-  inputFieldsGroup = new DefaultInputFieldGroup(inputFields);
-  fieldsValidator = new GroupValidator();
-  fieldsValidator.putValidator(WORD_FIELD, new NotEmptyValidator(
-    "Le mot doit être rempli"));
-  fieldsValidator.putValidator(WORD_FIELD, new PatternValidator("[^,]+",
-    "Le mot ne doit pas contenir de virgule", false));
-  fieldsValidator.putValidator(TRANSLATIONS_FIELD, new NotEmptyValidator(
-    "La traduction doit être remplie"));
+  val inputFields = Map(WORD_FIELD -> wordTextField, TRANSLATIONS_FIELD -> translationsTextField)
+  val fieldsValidator = new GroupValidator(Map(
+    WORD_FIELD -> new NotEmptyValidator("Le mot doit être rempli"),
+    WORD_FIELD -> new PatternValidator("[^,]+", "Le mot ne doit pas contenir de virgule", false),
+    TRANSLATIONS_FIELD -> new NotEmptyValidator("La traduction doit être remplie")))
   setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
   add(wordLabel);
   add(wordTextField);
@@ -133,8 +120,9 @@ class EntryPanel(frame: DictionaryFrame) extends JPanel {
   }
 
   def okButtonClicked() {
-    try {
-      fieldsValidator.validate(inputFieldsGroup.getCurrentValues());
+    val valuesMap = inputFields map (kv => (kv._1, kv._2.getCurrentValue()))
+    val validation = fieldsValidator.validate(valuesMap)
+    if (validation.isEmpty) {
       val word = wordTextField.getText().trim();
       val translations = translationsTextField.getText().trim();
       if (word.length() > 0 && translations.length() > 0) {
@@ -144,11 +132,8 @@ class EntryPanel(frame: DictionaryFrame) extends JPanel {
         frame.setModified(true);
         frame.newButtonClicked();
       }
-    } catch {
-      case e: FailedValidationException =>
-        new ErrorMessageDialog(frame, "Erreur dans les champs",
-          e.getReason(), e).setVisible(true);
-    }
+    } else
+      new ErrorMessageDialog(frame, "Erreur dans les champs", validation.toString).setVisible(true);
   }
 
 }
