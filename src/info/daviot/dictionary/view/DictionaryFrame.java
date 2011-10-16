@@ -256,8 +256,7 @@ public class DictionaryFrame extends JFrame {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.addSessionCompleteListener(new SessionCompleteListener() {
 			public void sessionComplete(final SessionCompleteEvent e) {
-				DictionaryFrame.this.sessionComplete(e.getScore(), session,
-						frame);
+				DictionaryFrame.this.sessionComplete(e.score(), session, frame);
 			}
 		});
 		frame.runSession();
