@@ -43,8 +43,8 @@ class DictionaryEntry {
   def addTranslation(translation: String) { translations.add(translation); }
   def removeTranslation(translation: String) { translations.remove(translation); }
 
-  def incrementGoodAnswers = goodAnswers += 1
-  def incrementWrongAnswers = wrongAnswers += 1
+  def incrementGoodAnswers() = goodAnswers += 1
+  def incrementWrongAnswers() = wrongAnswers += 1
 
   def firstTranslation() = translations.firstOption.getOrElse("")
 
