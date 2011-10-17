@@ -129,7 +129,7 @@ class EntryPanel(frame: DictionaryFrame) extends JPanel {
         modified = false;
         frame.addEntry(previousWord, word, translations,
           explainationTextArea.getText());
-        frame.setModified(true);
+        frame.modified = true
         frame.newButtonClicked();
       }
     } else
