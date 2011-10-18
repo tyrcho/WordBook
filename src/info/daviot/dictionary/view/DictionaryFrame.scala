@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.swing._;
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -68,6 +67,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
+import scala.swing.Action
 
 class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) extends JFrame {
   import DictionaryFrame._
@@ -101,60 +101,16 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
 
   var lastSelectedWord: String = _
 
-  val saveAction = new AbstractAction("Enregistrer") {
-    def actionPerformed(e: ActionEvent) {
-      saveClicked();
-    }
-  };
-
-  val exportAction = new AbstractAction("Exporter") {
-    def actionPerformed(e: ActionEvent) {
-      exportClicked();
-    }
-  };
-
-  val trainingAction = new AbstractAction("Entrainement") {
-    def actionPerformed(e: ActionEvent) {
-      runTraining();
-    }
-  };
-
-  val printAction = new AbstractAction("Imprimer") {
-    def actionPerformed(e: ActionEvent) {
-      //print();
-    }
-  };
-
-  val saveAsAction = new AbstractAction("Enregistrer sous") {
-    def actionPerformed(e: ActionEvent) {
-      saveAsClicked();
-    }
-  };
-
-  val loadAction = new AbstractAction("Charger") {
-    def actionPerformed(e: ActionEvent) {
-      loadClicked();
-    }
-  };
-
-  val helpAction = new AbstractAction("Aide") {
-    def actionPerformed(e: ActionEvent) {
-      showHelp();
-    }
-  };
-
-  val importAction = new AbstractAction("Importer") {
-    def actionPerformed(e: ActionEvent) {
-      importClicked();
-    }
-  };
-
-  val newDictionaryAction = new AbstractAction(
-    "Nouveau dictionnaire") {
-    def actionPerformed(e: ActionEvent) {
-      newDictionaryClicked();
-    }
-  };
+  val saveAction = Action("Enregistrer")(saveClicked).peer
+  val exportAction = Action("Exporter")(exportClicked).peer
+  val trainingAction = Action("Entrainement")(runTraining).peer
+  val printAction = Action("Imprimer") { //print();
+  }.peer
+  val saveAsAction = Action("Enregistrer sous")(saveAsClicked).peer
+  val loadAction = Action("Charger")(loadClicked).peer
+  val helpAction = Action("Aide")(showHelp).peer
+  val importAction = Action("Importer")(importClicked).peer
+  val newDictionaryAction = Action("Nouveau dictionnaire")(newDictionaryClicked).peer
 
   val statusBar = new JLabel();
 
