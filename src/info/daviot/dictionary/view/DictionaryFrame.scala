@@ -18,10 +18,8 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.Locale
 import java.util.Properties
-
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.swing.Action
-
 import info.daviot.scala.swing.MenuCreation._
 import DictionaryFrame.updatePropertiesFile
 import info.daviot.dictionary.model.factory.XstreamDictionaryFactory
@@ -55,9 +53,12 @@ import javax.swing.UIManager
 import javax.swing.WindowConstants
 import info.daviot.util.language.LocalizedResources._
 import info.daviot.util.language.LocalizedResources
+import info.daviot.scala.swing.SaveBeforeLoseModifications
 
-class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) extends JFrame {
+class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) extends JFrame with SaveBeforeLoseModifications {
   import DictionaryFrame._
+  //TODO when using scala components
+  //  optionPaneParent = this
   LocalizedResources.defaultFileName = "wordbook"
 
   val HELP_PAGE = "https://sites.google.com/site/micheldaviot/hobbies/apprentissage-du-chinois/logiciel"
@@ -79,18 +80,14 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
   val entryPanel = new EntryPanel(this)
   var currentFile: File = _
 
-  var _modified = false
-
-  def modified_=(m: Boolean) {
-    _modified = m
+  def setModified(m: Boolean) {
+    modified_=(m)
     updateStatus()
   }
 
-  def modified = _modified
-
   var lastSelectedWord: String = _
 
-  val saveAction = Action("Enregistrer")(saveClicked).peer
+  val saveAction = Action("Enregistrer")(save).peer
   val exportAction = Action("Exporter")(exportClicked).peer
   val trainingAction = Action("Entrainement")(runTraining).peer
   val printAction = Action("Imprimer") { //print()
@@ -118,7 +115,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
     if (parameters != null) {
       parameters.ignoredChars_$eq(ignoredChars)
       runSession(new Session(parameters))
-      modified = true
+      setModified(true)
     }
   }
 
@@ -229,7 +226,8 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
   }
 
   private def loadClicked() {
-    if (isSaved("Attention aux données en cours", "Sauver les données en cours ?")) {
+    if (checkAndSave("Attention aux données en cours", "Sauver les données en cours ?")) {
+      //isSaved("Attention aux données en cours", "Sauver les données en cours ?")) {
       val fileChooser = new JFileChooser()
       fileChooser.setFileFilter(filter)
       fileChooser.setDialogType(JFileChooser.OPEN_DIALOG)
@@ -265,8 +263,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
 
   private def load(file: File) {
     try {
-      factory.fileName_$eq(file.getAbsolutePath())
-      dictionary = factory.load()
+      dictionary = factory.load(file)
       updateFrame(file, dictionary)
     } catch {
       case e: Exception =>
@@ -277,9 +274,8 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
 
   private def importFile(file: File) {
     try {
-      factory.fileName_$eq(file.getAbsolutePath())
-      val imported = factory.load()
-      modified = true
+      val imported = factory.load(file)
+      setModified(true)
       dictionary.addAll(imported)
       updateFrame(currentFile, dictionary)
     } catch {
@@ -351,18 +347,15 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
     false
   }
 
-  private def saveClicked() = save(currentFile)
+  override def save(): Boolean = save(currentFile)
 
   private def save(file: File): Boolean = {
     try {
-      factory.fileName_$eq(file.getAbsolutePath())
-      factory.save(dictionary)
+      factory.save(dictionary, file)
       saveAction.setEnabled(true)
-      modified = false
+      setModified(false)
       updateStatus()
-      JOptionPane.showMessageDialog(this,
-        "Le fichier " + file.getAbsolutePath()
-          + " a été enregistré.")
+      JOptionPane.showMessageDialog(this, format("Le fichier %s a été enregistré.", file.getAbsolutePath))
       true
     } catch {
       case e: Exception =>
@@ -383,29 +376,6 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
     val f = if (currentFile == null) "" else currentFile.getName()
     val m = if (modified) "modifié" else ""
     statusBar.setText(f + " " + m)
-  }
-
-  private def isSaved(title: String, message: String): Boolean = {
-    if (!modified)
-      true
-    val response = JOptionPane.showConfirmDialog(this, message, title,
-      JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)
-    response match {
-      case JOptionPane.YES_OPTION =>
-        if (currentFile == null) {
-          saveAsClicked()
-        } else {
-          saveClicked()
-        }
-
-      case JOptionPane.NO_OPTION =>
-        true
-
-      case JOptionPane.CANCEL_OPTION =>
-        false
-      case _ =>
-        false
-    }
   }
 
   def addEntry(previousWord: String, word: String, translations: String, explanation: String) {
@@ -522,7 +492,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
     addWindowListener(new WindowAdapter() {
       override def windowClosing(e: WindowEvent) {
-        if (isSaved("Confirmer la sortie", "Sauver avant de quitter ?"))
+        if (checkAndSave("Confirmer la sortie", "Sauver avant de quitter ?"))
           dispose()
       }
     })
@@ -587,7 +557,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
       dictionary.removeSecondLanguageWord(selectedWord)
     }
     listModel.removeElement(selectedWord)
-    modified = true
+    setModified(true)
   }
 
   def newButtonClicked() {
@@ -644,7 +614,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
   }
 
   def newDictionaryClicked() {
-    if (isSaved("Attention aux donnèes en cours", "Sauver les données en cours ?")) {
+    if (checkAndSave("Attention aux donnèes en cours", "Sauver les données en cours ?")) {
       val firstLanguage = JOptionPane.showInputDialog(this, "Première langue ?", null, JOptionPane.INFORMATION_MESSAGE,
         null, Locale.getISOLanguages().asInstanceOf[Array[Object]], "fr").asInstanceOf[String]
       val secondLanguage = JOptionPane.showInputDialog(this,

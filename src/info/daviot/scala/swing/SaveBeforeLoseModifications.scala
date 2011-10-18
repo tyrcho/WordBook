@@ -5,8 +5,6 @@ import scala.swing.Dialog._
 
 trait SaveBeforeLoseModifications {
   var modified: Boolean = false
-  var title = "Confirm"
-  var message = "Save before exit ?"
   var optionPaneParent: Component = null
 
   /**
@@ -15,9 +13,9 @@ trait SaveBeforeLoseModifications {
    */
   def save: Boolean
 
-  def checkAndSave(): Boolean = {
+  def checkAndSave(message: String = "Do you want to save before ?", popupTitle: String = "Confirm"): Boolean = {
     if (modified) {
-      Dialog.showConfirmation(optionPaneParent, message, title, Options.YesNoCancel) match {
+      Dialog.showConfirmation(optionPaneParent, message, popupTitle, Options.YesNoCancel) match {
         case Result.Yes =>
           if (save) {
             modified = false
