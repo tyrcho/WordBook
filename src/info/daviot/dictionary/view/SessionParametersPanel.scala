@@ -3,7 +3,7 @@ package info.daviot.dictionary.view
 import info.daviot.dictionary.model.SessionParameters
 import info.daviot.dictionary.model.TwoWayDictionary
 import info.daviot.gui.component.TextFieldWithSlider
-import info.daviot.gui.toolkit.RadioButtonGroup
+import info.daviot.gui.RadioButtonGroup
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.event.ActionEvent
@@ -57,6 +57,6 @@ object SessionParametersPanel {
     if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(frame, panel, "Paramètres de session", JOptionPane.OK_CANCEL_OPTION))
       panel.getSessionParameters()
     else
-       null
+      null
   }
 }

@@ -28,7 +28,7 @@ import info.daviot.dictionary.model.SessionCompleteListener
 import info.daviot.dictionary.model.TwoWayDictionary
 import info.daviot.dictionary.DictionaryConstants
 import info.daviot.gui.component.ErrorMessageDialog
-import info.daviot.gui.toolkit.RadioButtonGroup
+import info.daviot.gui.RadioButtonGroup
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.event.ListSelectionEvent
@@ -78,10 +78,17 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
   val helpButton = new JButton("Aide")
   val deleteButton = new JButton("Supprimer")
   val searchField = new JTextField(10)
-  val languages = new HashMap[String, String]()
-  languages.put(firstLanguageName, firstLanguageName)
-  languages.put(secondLanguageName, secondLanguageName)
-  var languageSelector = new RadioButtonGroup(SwingConstants.HORIZONTAL, languages)
+
+  var languageSelector = buildSelector
+  def buildSelector = {
+    val languages = Map(firstLanguageName -> firstLanguageName, secondLanguageName -> secondLanguageName)
+    val selector = new RadioButtonGroup(SwingConstants.HORIZONTAL, languages)
+    selector.setCurrentValue(secondLanguageName)
+    selector.addActionListener(new ActionListener() {
+      def actionPerformed(e: ActionEvent) { Swing.onEDT(updateLanguageSelected) }
+    })
+    selector
+  }
 
   var firstLanguageSelected = false
 
@@ -399,7 +406,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
     val splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
     contentPane.add(splitPane, BorderLayout.CENTER)
     contentPane.add(statusBar, BorderLayout.SOUTH)
-    splitPane.setLeftComponent(buildLeftPanel())
+    splitPane.setLeftComponent(leftPanel)
     splitPane.setRightComponent(entryPanel)
     entryPanel.setEnabled(false)
     SwingUtilities.invokeLater(new Runnable() {
@@ -408,7 +415,6 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
       }
     })
     setupListeners()
-    languageSelector.setCurrentValue(secondLanguageName)
     setupMenu()
   }
 
@@ -464,19 +470,10 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
         deleteButtonClicked()
       }
     })
-    languageSelector.addActionListener(new ActionListener() {
-      def actionPerformed(e: ActionEvent) {
-        SwingUtilities.invokeLater(new Runnable() {
-          def run() {
-            updateLanguageSelected()
-          }
-        })
-      }
-    })
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
     addWindowListener(new WindowAdapter() {
       override def windowClosing(e: WindowEvent) {
-        if (checkAndSave("Confirmer la sortie", "Sauver avant de quitter ?"))
+        if (checkAndSave("Sauver avant de quitter ?", "Attention"))
           dispose()
       }
     })
@@ -512,7 +509,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
     lastSelectedWord = selectedWord
   }
 
-  private def buildLeftPanel(): Component = {
+  lazy val leftPanel: JPanel = {
     val panel = new JPanel(new BorderLayout())
     val topBox = Box.createHorizontalBox()
     topBox.add(newButton)
@@ -625,6 +622,9 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
     updateStatus
     setVisible(true)
     updateTitle
+    leftPanel.remove(languageSelector)
+    languageSelector = buildSelector
+    leftPanel.add(languageSelector, BorderLayout.SOUTH)
   }
 }
 
