@@ -11,7 +11,7 @@ import info.daviot.dictionary.model.TwoWayDictionary
 import info.daviot.dictionary.DictionaryConstants
 import info.daviot.dictionary.model.DictionaryEntry
 
-class XstreamDictionaryFactory {
+object XstreamDictionaryFactory {
   val xstream = new XStream(new DomDriver())
   xstream.alias("dictionary", classOf[TwoWayDictionary])
   xstream.alias("entry", classOf[DictionaryEntry])

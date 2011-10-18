@@ -22,7 +22,6 @@ import scala.collection.JavaConversions.asScalaBuffer
 import scala.swing.Action
 import info.daviot.scala.swing.MenuCreation._
 import DictionaryFrame.updatePropertiesFile
-import info.daviot.dictionary.model.factory.XstreamDictionaryFactory
 import info.daviot.dictionary.model.Session
 import info.daviot.dictionary.model.SessionCompleteEvent
 import info.daviot.dictionary.model.SessionCompleteListener
@@ -54,6 +53,8 @@ import javax.swing.WindowConstants
 import info.daviot.util.language.LocalizedResources._
 import info.daviot.util.language.LocalizedResources
 import info.daviot.scala.swing.SaveBeforeLoseModifications
+import info.daviot.dictionary.model.factory.XstreamDictionaryFactory
+import scala.swing.Swing
 
 class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) extends JFrame with SaveBeforeLoseModifications {
   import DictionaryFrame._
@@ -99,8 +100,6 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
   val newDictionaryAction = Action("Nouveau dictionnaire")(newDictionaryClicked).peer
 
   val statusBar = new JLabel()
-
-  val factory = new XstreamDictionaryFactory()
 
   var ignoredChars: String = _
 
@@ -263,24 +262,24 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
 
   private def load(file: File) {
     try {
-      dictionary = factory.load(file)
+      dictionary = XstreamDictionaryFactory.load(file)
       updateFrame(file, dictionary)
     } catch {
       case e: Exception =>
-        new ErrorMessageDialog(this, "Fichier non valide", "Ce fichier n'a pas pu être lu " + file.getAbsolutePath(), e).setVisible(true)
+        showLoadError(file, e)
         updateFrame(file, new TwoWayDictionary("", ""))
     }
   }
 
   private def importFile(file: File) {
     try {
-      val imported = factory.load(file)
+      val imported = XstreamDictionaryFactory.load(file)
       setModified(true)
       dictionary.addAll(imported)
       updateFrame(currentFile, dictionary)
     } catch {
       case e: Exception =>
-        new ErrorMessageDialog(this, "Fichier non valide", "Ce fichier n'a pas pu être lu " + file.getAbsolutePath(), e).setVisible(true)
+        showLoadError(file, e)
     }
   }
 
@@ -293,12 +292,9 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
         if (!(file.getName().indexOf('.') > 0)) {
           file = new File(file.getAbsolutePath() + ".csv")
         }
-        if (!file.exists()
-          || JOptionPane.YES_OPTION == JOptionPane
-          .showConfirmDialog(this, "Ecraser le fichier "
-            + file.getAbsolutePath(), "Ecraser ?",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE)) {
+        if (!file.exists || JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
+          "Ecraser le fichier " + file.getAbsolutePath(), "Ecraser ?",
+          JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
           export(file, firstLanguage.get)
         }
       }
@@ -351,7 +347,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
 
   private def save(file: File): Boolean = {
     try {
-      factory.save(dictionary, file)
+      XstreamDictionaryFactory.save(dictionary, file)
       saveAction.setEnabled(true)
       setModified(false)
       updateStatus()
@@ -369,6 +365,14 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
       this,
       "Impossible d'enregistrer",
       "Impossible d'écrire dans le fichier " + file.getAbsolutePath(),
+      e).setVisible(true)
+  }
+
+  private def showLoadError(file: File, e: Exception) {
+    new ErrorMessageDialog(
+      this,
+      "Impossible de charger",
+      "Impossible de lire le fichier " + file.getAbsolutePath(),
       e).setVisible(true)
   }
 
@@ -441,23 +445,9 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
 
   private def setupListeners() {
     searchField.getDocument().addDocumentListener(new DocumentListener() {
-      val updateListRunner = new Runnable() {
-        def run() {
-          updateList()
-        }
-      }
-
-      def insertUpdate(e: DocumentEvent) {
-        SwingUtilities.invokeLater(updateListRunner)
-      }
-
-      def removeUpdate(e: DocumentEvent) {
-        SwingUtilities.invokeLater(updateListRunner)
-      }
-
-      def changedUpdate(e: DocumentEvent) {
-        SwingUtilities.invokeLater(updateListRunner)
-      }
+      def insertUpdate(e: DocumentEvent) { Swing.onEDT(updateList) }
+      def removeUpdate(e: DocumentEvent) { Swing.onEDT(updateList) }
+      def changedUpdate(e: DocumentEvent) { Swing.onEDT(updateList) }
     })
     wordsList.addListSelectionListener(new ListSelectionListener() {
       def valueChanged(e: ListSelectionEvent) {
