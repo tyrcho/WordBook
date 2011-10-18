@@ -1,4 +1,4 @@
-package info.daviot.dictionary.model;
+package info.daviot.dictionary.model
 
 import info.daviot.dictionary.Utils
 

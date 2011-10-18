@@ -1,5 +1,5 @@
-package info.daviot.dictionary.model;
+package info.daviot.dictionary.model
 
-import java.util.EventObject;
+import java.util.EventObject
 
 class SessionCompleteEvent(source: Any, val score: String) extends EventObject(source)

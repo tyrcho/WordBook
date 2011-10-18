@@ -1,4 +1,4 @@
-package info.daviot.util.validation;
+package info.daviot.util.validation
 
 /**
  * Applies a group of validators to a group of objects.

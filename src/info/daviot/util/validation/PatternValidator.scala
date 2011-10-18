@@ -1,4 +1,4 @@
-package info.daviot.util.validation;
+package info.daviot.util.validation
 
 /**
  * Validates an object by matching its String representation with a regexp pattern.

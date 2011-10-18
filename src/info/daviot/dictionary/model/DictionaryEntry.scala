@@ -26,7 +26,7 @@ class DictionaryEntry {
   /**
    * Gets the ratio in order to sort on it.
    *
-   * @return the ratio, or -1 if only wrong answers, or 0 if no answer has
+   * @ the ratio, or -1 if only wrong answers, or 0 if no answer has
    *         been recorded
    */
   def getGoodAnswerProportion(): Float = {
@@ -34,14 +34,14 @@ class DictionaryEntry {
     if (total == 0) {
       0
     } else if (goodAnswers == 0) {
-      return -1
+       -1
     } else {
-      return (goodAnswers.floatValue()) / total
+       (goodAnswers.floatValue()) / total
     }
   }
 
-  def addTranslation(translation: String) { translations.add(translation); }
-  def removeTranslation(translation: String) { translations.remove(translation); }
+  def addTranslation(translation: String) { translations.add(translation) }
+  def removeTranslation(translation: String) { translations.remove(translation) }
 
   def incrementGoodAnswers() = goodAnswers += 1
   def incrementWrongAnswers() = wrongAnswers += 1

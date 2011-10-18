@@ -1,6 +1,6 @@
-package info.daviot.dictionary.model.factory;
+package info.daviot.dictionary.model.factory
 
-import info.daviot.dictionary.model.TwoWayDictionary;
+import info.daviot.dictionary.model.TwoWayDictionary
 
 trait DictionnaryFactory {
   def load(): TwoWayDictionary

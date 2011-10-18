@@ -1,4 +1,4 @@
-package info.daviot.dictionary;
+package info.daviot.dictionary
 
 import scala.collection.JavaConversions._
 

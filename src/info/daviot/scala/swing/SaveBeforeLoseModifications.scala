@@ -10,7 +10,7 @@ trait SaveBeforeLoseModifications {
   var optionPaneParent: Component = null
 
   /**
-   * Tries to save, return true for success, false for failure.
+   * Tries to save,  true for success, false for failure.
    * Exception will no be handled by the trait.
    */
   def save: Boolean

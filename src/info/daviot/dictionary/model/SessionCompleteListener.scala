@@ -1,6 +1,6 @@
-package info.daviot.dictionary.model;
+package info.daviot.dictionary.model
 
-import java.util.EventListener;
+import java.util.EventListener
 
 trait SessionCompleteListener extends EventListener {
   def sessionComplete(e: SessionCompleteEvent)

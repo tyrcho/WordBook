@@ -1,12 +1,12 @@
-package info.daviot.gui.component;
+package info.daviot.gui.component
 
-import java.awt.BorderLayout;
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.BorderLayout
+import java.awt.Dialog
+import java.awt.Frame
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 
 import javax.swing._
 
@@ -16,31 +16,31 @@ import javax.swing._
 class InformationDialog(frame: Frame, title: String) extends JDialog(frame, title) {
 
   val mainPanel = new JPanel()
-  val closeButton = new JButton("Fermer");
+  val closeButton = new JButton("Fermer")
 
-  setTitle(title);
-  setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-  setResizable(false);
+  setTitle(title)
+  setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
+  setResizable(false)
   val controller = new ActionListener() {
 
     def actionPerformed(e: ActionEvent) {
-      InformationDialog.this.dispose();
+      InformationDialog.this.dispose()
     }
   }
-  closeButton.addActionListener(controller);
-  val buttons = new JPanel(new BorderLayout());
-  val buttonsBox = Box.createHorizontalBox();
-  buttonsBox.add(Box.createGlue());
-  buttonsBox.add(closeButton);
-  buttons.add(buttonsBox, BorderLayout.CENTER);
-  getContentPane().add(mainPanel, BorderLayout.CENTER);
-  getContentPane().add(buttons, BorderLayout.SOUTH);
-  pack();
+  closeButton.addActionListener(controller)
+  val buttons = new JPanel(new BorderLayout())
+  val buttonsBox = Box.createHorizontalBox()
+  buttonsBox.add(Box.createGlue())
+  buttonsBox.add(closeButton)
+  buttons.add(buttonsBox, BorderLayout.CENTER)
+  getContentPane().add(mainPanel, BorderLayout.CENTER)
+  getContentPane().add(buttons, BorderLayout.SOUTH)
+  pack()
   addWindowListener(new WindowAdapter() {
     override def windowClosing(e: WindowEvent) {
-      dispose();
+      dispose()
     }
-  });
+  })
 
   def getInsidePanel() = mainPanel
   def getCloseButton() = closeButton
