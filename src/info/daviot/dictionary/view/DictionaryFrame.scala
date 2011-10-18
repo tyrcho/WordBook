@@ -53,9 +53,13 @@ import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.WindowConstants
+import info.daviot.util.language.LocalizedResources._
+import info.daviot.util.language.LocalizedResources
 
 class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) extends JFrame {
   import DictionaryFrame._
+  LocalizedResources.defaultFileName = "wordbook"
+
   val HELP_PAGE = "https://sites.google.com/site/micheldaviot/hobbies/apprentissage-du-chinois/logiciel"
   val STRING_SEPARATOR = ",( )*"
   val EXTENSION = "dict"
@@ -64,7 +68,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
   val listModel = new DefaultListModel()
   val wordsList = new WordsDisplayAsList(listModel)
 
-  val newButton = new JButton("Nouveau")
+  val newButton = new JButton("New".l)
   val helpButton = new JButton("Aide")
   val deleteButton = new JButton("Supprimer")
   val searchField = new JTextField(10)
