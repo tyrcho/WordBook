@@ -55,13 +55,17 @@ import info.daviot.util.language.LocalizedResources
 import info.daviot.scala.swing.SaveBeforeLoseModifications
 import info.daviot.dictionary.model.factory.XstreamDictionaryFactory
 import scala.swing.Swing
+import scala.swing.SimpleSwingApplication
+import scala.swing.Frame
 
-class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) extends JFrame with SaveBeforeLoseModifications {
+class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
   import DictionaryFrame._
   //TODO when using scala components
   //  optionPaneParent = this
   LocalizedResources.defaultFileName = "wordbook"
 
+  var firstLanguageName: String = "FR"
+  var secondLanguageName: String = "EN"
   val HELP_PAGE = "https://sites.google.com/site/micheldaviot/hobbies/apprentissage-du-chinois/logiciel"
   val STRING_SEPARATOR = ",( )*"
   val EXTENSION = "dict"
@@ -74,7 +78,10 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
   val helpButton = new JButton("Aide")
   val deleteButton = new JButton("Supprimer")
   val searchField = new JTextField(10)
-  var languageSelector: RadioButtonGroup = _
+  val languages = new HashMap[String, String]()
+  languages.put(firstLanguageName, firstLanguageName)
+  languages.put(secondLanguageName, secondLanguageName)
+  var languageSelector = new RadioButtonGroup(SwingConstants.HORIZONTAL, languages)
 
   var firstLanguageSelected = false
 
@@ -101,6 +108,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
 
   val statusBar = new JLabel()
 
+  //TODO : define ignored chars based on languages (especially for Arabic)
   var ignoredChars: String = _
 
   dictionary = new TwoWayDictionary(firstLanguageName, secondLanguageName)
@@ -112,7 +120,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
       .showSessionParametersDialog(this,
         "Choisir la configuration de l'exercice", dictionary)
     if (parameters != null) {
-      parameters.ignoredChars_$eq(ignoredChars)
+      parameters.ignoredChars = ignoredChars
       runSession(new Session(parameters))
       setModified(true)
     }
@@ -247,27 +255,13 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
     }
   }
 
-  private def updateFrame(file: File, dictionary: TwoWayDictionary) {
-    val frame = new DictionaryFrame(dictionary.firstLanguage, dictionary.secondLanguage)
-    frame.dictionary = dictionary
-    frame.ignoredChars = ignoredChars
-    frame.setCurrentFile(file)
-    frame.updateList()
-    frame.pack()
-    frame.setBounds(getBounds())
-    frame.updateStatus()
-    frame.setVisible(true)
-    dispose()
-  }
-
   private def load(file: File) {
     try {
       dictionary = XstreamDictionaryFactory.load(file)
-      updateFrame(file, dictionary)
+      update(file, dictionary)
     } catch {
       case e: Exception =>
         showLoadError(file, e)
-        updateFrame(file, new TwoWayDictionary("", ""))
     }
   }
 
@@ -276,7 +270,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
       val imported = XstreamDictionaryFactory.load(file)
       setModified(true)
       dictionary.addAll(imported)
-      updateFrame(currentFile, dictionary)
+      update(currentFile, dictionary)
     } catch {
       case e: Exception =>
         showLoadError(file, e)
@@ -530,11 +524,6 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
     panel.add(topBox, BorderLayout.NORTH)
     wordsList.setFont(DictionaryConstants.FONT)
     panel.add(new JScrollPane(wordsList.asInstanceOf[Component]), BorderLayout.CENTER)
-    val languages = new HashMap[String, String]()
-    languages.put(firstLanguageName, firstLanguageName)
-    languages.put(secondLanguageName, secondLanguageName)
-    languageSelector = new RadioButtonGroup(SwingConstants.HORIZONTAL,
-      languages)
     panel.add(languageSelector, BorderLayout.SOUTH)
     panel
   }
@@ -611,7 +600,7 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
         "Deuxième langue ?", null, JOptionPane.INFORMATION_MESSAGE,
         null, Locale.getISOLanguages().asInstanceOf[Array[Object]], "en").asInstanceOf[String]
       dictionary = new TwoWayDictionary(firstLanguage, secondLanguage)
-      updateFrame(null, dictionary)
+      update(null, dictionary)
     }
   }
 
@@ -625,22 +614,40 @@ class DictionaryFrame(firstLanguageName: String, secondLanguageName: String) ext
           .setVisible(true)
     }
   }
+
+  def update(file: File, dictionary: TwoWayDictionary) {
+    firstLanguageName = dictionary.firstLanguage
+    secondLanguageName = dictionary.secondLanguage
+    this.dictionary = dictionary
+    setCurrentFile(file)
+    updateList
+    pack
+    updateStatus
+    setVisible(true)
+    updateTitle
+  }
 }
 
-object DictionaryFrame extends Application {
+object DictionaryFrame extends SimpleSwingApplication {
   val propertiesFileName = System.getProperty("user.home") + "/dict.properties"
-
   UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-  val frame = new DictionaryFrame("Français", "Español")
-  // frame.addEntry("hola", "salut, bonjour", "Hola se�or")
-  frame.pack()
-  try {
-    frame.load(new File(readPropertiesFile()))
-  } catch {
-    case e: IOException =>
-      println("Premier démarrage, le fichier " + propertiesFileName + " n'existe pas encore")
-      frame.setVisible(true)
+
+  override val top = new Frame {
+    override lazy val peer = new DictionaryFrame with InterfaceMixin
+    pack
   }
+  top.peer.load(new File(readPropertiesFile()))
+
+  //  val frame = new DictionaryFrame("Français", "Español")
+  // frame.addEntry("hola", "salut, bonjour", "Hola se�or")
+  //  frame.pack()
+  //  try {
+  //    //    top.peer.load(new File(readPropertiesFile()))
+  //  } catch {
+  //    case e: IOException =>
+  //      println("Premier démarrage, le fichier " + propertiesFileName + " n'existe pas encore")
+  //    //      frame.setVisible(true)
+  //  }
 
   def readPropertiesFile(): String = {
     val properties = new Properties()
