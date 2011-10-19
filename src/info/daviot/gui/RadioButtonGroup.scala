@@ -27,13 +27,15 @@ class RadioButtonGroup(orientation: Int, values: Map[String, Any]) extends JPane
   val deselect = new JRadioButton();
 
   val buttonsBox = if (SwingConstants.VERTICAL == orientation) Box.createVerticalBox() else Box.createHorizontalBox()
-  val buttons = values.map(kv => (kv._2 -> new JRadioButton(kv._1)))
-  buttons foreach (kv => {
-    kv._2.addActionListener(new ActionListener() { def actionPerformed(e: ActionEvent) { selectedValue = kv._1 } })
-    buttonsBox.add(kv._2)
-    buttonsBox.add(Box.createGlue())
-    buttonGroup.add(kv._2);
-  })
+  val buttons = values.map { case (label, value) => (value -> new JRadioButton(label)) }
+  buttons foreach {
+    case (value, button) => {
+      button.addActionListener(new ActionListener() { def actionPerformed(e: ActionEvent) { selectedValue = value } })
+      buttonsBox.add(button)
+      buttonsBox.add(Box.createGlue())
+      buttonGroup.add(button);
+    }
+  }
 
   buttonGroup.add(deselect);
   add(buttonsBox, BorderLayout.CENTER);
@@ -50,7 +52,7 @@ class RadioButtonGroup(orientation: Int, values: Map[String, Any]) extends JPane
 
   def setCurrentValue(newValue: Any) {
     buttons.find(_._1 == newValue) match {
-      case Some(b) => b._2.doClick
+      case Some((_, button)) => button.doClick
       case None => deselect.setSelected(true)
     }
   }
