@@ -1,0 +1,68 @@
+<project name="WordBook" default="proguard" basedir=".">
+	<description>
+    	Builds WordBook jar
+    </description>
+
+	<property name="scala.home" value="D:\eclipse-jee-helios-SR2-win32\configuration\org.eclipse.osgi\bundles\728\1\.cp\" />
+	<property name="lib" location="D:\dev\java\lib\" />
+	<property name="mainclass" value="info.daviot.dictionary.view.DictionaryFrame"/>
+
+
+	<target name="jar">
+		<jar basedir="bin" file="lib/wordbook.jar" excludes="**/*Test.class">
+			<manifest>
+				<attribute name="Main-Class" value="${mainclass}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="proguard" depends="jar">
+		<taskdef resource="proguard/ant/task.properties" classpath="${lib}/proguard/lib/proguard.jar" />
+		<proguard>
+			<injar file="lib/wordbook.jar"/>
+			<injar file="${scala.home}/lib/scala-library.jar"/>
+			<injar file="${scala.home}/lib/scala-swing.jar"/>
+			<libraryjar file="${java.home}/lib/rt.jar"/>
+			<libraryjar file="${lib}\xstream-1.1.2.jar"/>
+			<outjar file="lib/out.jar"/>
+		
+			-dontwarn scala.swing.**
+			-dontwarn **$$anonfun$*
+			-dontwarn scala.collection.immutable.RedBlack$Empty
+			-dontwarn scala.tools.**,plugintemplate.**
+			
+			-keep class * implements org.xml.sax.EntityResolver
+
+			-keepclassmembers class * {
+			    ** MODULE$;
+			}
+			
+			-keepclassmembernames class scala.concurrent.forkjoin.ForkJoinPool {
+			    long eventCount;
+			    int  workerCounts;
+			    int  runControl;
+			    scala.concurrent.forkjoin.ForkJoinPool$WaitQueueNode syncStack;
+			    scala.concurrent.forkjoin.ForkJoinPool$WaitQueueNode spareStack;
+			}
+
+			-keepclassmembernames class scala.concurrent.forkjoin.ForkJoinWorkerThread {
+			    int base;
+			    int sp;
+			    int runState;
+			}
+
+			-keepclassmembernames class scala.concurrent.forkjoin.ForkJoinTask {
+			    int status;
+			}
+
+			-keepclassmembernames class scala.concurrent.forkjoin.LinkedTransferQueue {
+			    scala.concurrent.forkjoin.LinkedTransferQueue$PaddedAtomicReference head;
+			    scala.concurrent.forkjoin.LinkedTransferQueue$PaddedAtomicReference tail;
+			    scala.concurrent.forkjoin.LinkedTransferQueue$PaddedAtomicReference cleanMe;
+			}
+			  -keep public class ${mainclass} {
+		    		public static void main(java.lang.String[]);
+			  }
+	</proguard>
+	</target>
+</project>
