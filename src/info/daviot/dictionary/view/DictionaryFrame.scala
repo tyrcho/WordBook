@@ -5,7 +5,6 @@ import java.awt.event.ActionListener
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.awt.BorderLayout
-import java.awt.Component
 import java.awt.Desktop
 import java.io.File
 import java.io.FileInputStream
@@ -54,11 +53,10 @@ import info.daviot.util.language.LocalizedResources._
 import info.daviot.util.language.LocalizedResources
 import info.daviot.scala.swing.SaveBeforeLoseModifications
 import info.daviot.dictionary.model.factory.XstreamDictionaryFactory
-import scala.swing.Swing
-import scala.swing.SimpleSwingApplication
-import scala.swing.Frame
+import scala.swing._
+import scala.swing.event._
 
-class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
+class DictionaryFrame extends Frame with SaveBeforeLoseModifications {
   import DictionaryFrame._
   //TODO when using scala components
   //  optionPaneParent = this
@@ -74,10 +72,10 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
   val listModel = new DefaultListModel()
   val wordsList = new WordsDisplayAsList(listModel)
 
-  val newButton = new JButton("New".l)
-  val helpButton = new JButton("Aide")
-  val deleteButton = new JButton("Supprimer")
-  val searchField = new JTextField(10)
+  val newButton = new Button("New".l)
+  val helpButton = new Button("Aide")
+  val deleteButton = new Button("Supprimer")
+  val searchField = new TextField(10)
 
   var languageSelector = buildSelector
   def buildSelector = {
@@ -113,7 +111,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
   val importAction = Action("Importer")(importClicked).peer
   val newDictionaryAction = Action("Nouveau dictionnaire")(newDictionaryClicked).peer
 
-  val statusBar = new JLabel()
+  val statusBar = new Label
 
   //TODO : define ignored chars based on languages (especially for Arabic)
   var ignoredChars: String = _
@@ -123,9 +121,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
   setupFrame()
 
   private def runTraining() {
-    val parameters = SessionParametersPanel
-      .showSessionParametersDialog(this,
-        "Choisir la configuration de l'exercice", dictionary)
+    val parameters = SessionParametersPanel.showSessionParametersDialog(peer, "Choisir la configuration de l'exercice", dictionary)
     if (parameters != null) {
       parameters.ignoredChars = ignoredChars
       runSession(new Session(parameters))
@@ -179,9 +175,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
 
   private def popupChooseLanguage(): Option[Boolean] = {
     val choices: Array[Object] = Array(firstLanguageName, secondLanguageName)
-    val choice = JOptionPane.showInputDialog(this,
-      "Choisir le langage de tri", "", JOptionPane.QUESTION_MESSAGE,
-      null, choices, choices(0))
+    val choice = JOptionPane.showInputDialog(peer, "Choisir le langage de tri", "", JOptionPane.QUESTION_MESSAGE, null, choices, choices(0))
     if (choice == null) {
       None
     } else {
@@ -236,7 +230,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
   }
 
   private def updateTitle() {
-    setTitle("Dictionnaire " + firstLanguageName + "-" + secondLanguageName)
+    title = "Dictionnaire " + firstLanguageName + "-" + secondLanguageName
   }
 
   private def loadClicked() {
@@ -245,7 +239,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
       val fileChooser = new JFileChooser()
       fileChooser.setFileFilter(filter)
       fileChooser.setDialogType(JFileChooser.OPEN_DIALOG)
-      if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(this)) {
+      if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(peer)) {
         val file = fileChooser.getSelectedFile()
         load(file)
       }
@@ -256,7 +250,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
     val fileChooser = new JFileChooser()
     fileChooser.setFileFilter(filter)
     fileChooser.setDialogType(JFileChooser.OPEN_DIALOG)
-    if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(this)) {
+    if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(peer)) {
       val file = fileChooser.getSelectedFile()
       importFile(file)
     }
@@ -288,12 +282,12 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
     val firstLanguage = popupChooseLanguage()
     if (firstLanguage.isDefined) {
       val fileChooser = new JFileChooser()
-      if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(this)) {
+      if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(peer)) {
         var file = fileChooser.getSelectedFile()
         if (!(file.getName().indexOf('.') > 0)) {
           file = new File(file.getAbsolutePath() + ".csv")
         }
-        if (!file.exists || JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
+        if (!file.exists || JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(peer,
           "Ecraser le fichier " + file.getAbsolutePath(), "Ecraser ?",
           JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
           export(file, firstLanguage.get)
@@ -327,14 +321,14 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
   private def saveAsClicked(): Boolean = {
     val fileChooser = new JFileChooser()
     fileChooser.setFileFilter(filter)
-    if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(this)) {
+    if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(peer)) {
       var file = fileChooser.getSelectedFile()
       if (!(file.getName().indexOf('.') > 0)) {
         file = new File(file.getAbsolutePath() + "." + EXTENSION)
       }
       if (!file.exists()
         || JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-          this,
+          peer,
           "Ecraser le fichier " + file.getAbsolutePath(),
           "Ecraser ?", JOptionPane.YES_NO_OPTION,
           JOptionPane.QUESTION_MESSAGE)) {
@@ -352,7 +346,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
       saveAction.setEnabled(true)
       setModified(false)
       updateStatus()
-      JOptionPane.showMessageDialog(this, format("Le fichier %s a été enregistré.", file.getAbsolutePath))
+      JOptionPane.showMessageDialog(peer, format("Le fichier %s a été enregistré.", file.getAbsolutePath))
       true
     } catch {
       case e: Exception =>
@@ -363,7 +357,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
 
   private def showSaveError(file: File, e: Exception) {
     new ErrorMessageDialog(
-      this,
+      peer,
       "Impossible d'enregistrer",
       "Impossible d'écrire dans le fichier " + file.getAbsolutePath(),
       e).setVisible(true)
@@ -371,7 +365,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
 
   private def showLoadError(file: File, e: Exception) {
     new ErrorMessageDialog(
-      this,
+      peer,
       "Impossible de charger",
       "Impossible de lire le fichier " + file.getAbsolutePath(),
       e).setVisible(true)
@@ -380,7 +374,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
   private def updateStatus() {
     val f = if (currentFile == null) "" else currentFile.getName()
     val m = if (modified) "modifié" else ""
-    statusBar.setText(f + " " + m)
+    statusBar.text = f + " " + m
   }
 
   def addEntry(previousWord: String, word: String, translations: String, explanation: String) {
@@ -401,89 +395,69 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
   }
 
   private def setupFrame() {
-    val contentPane = getContentPane()
-    contentPane.setLayout(new BorderLayout())
-    val splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
-    contentPane.add(splitPane, BorderLayout.CENTER)
-    contentPane.add(statusBar, BorderLayout.SOUTH)
-    splitPane.setLeftComponent(leftPanel)
-    splitPane.setRightComponent(entryPanel)
-    entryPanel.setEnabled(false)
-    SwingUtilities.invokeLater(new Runnable() {
-      def run() {
-        updateLanguageSelected()
-      }
-    })
+    contents = new BorderPanel {
+      val splitPane = new SplitPane(Orientation.Vertical)
+      add(splitPane, BorderPanel.Position.Center)
+      add(statusBar, BorderPanel.Position.South)
+      splitPane.leftComponent = leftPanel
+      splitPane.rightComponent = Component.wrap(entryPanel)
+      entryPanel.setEnabled(false)
+
+      SwingUtilities.invokeLater(new Runnable() {
+        def run() {
+          updateLanguageSelected()
+        }
+      })
+    }
     setupListeners()
     setupMenu()
   }
 
   private def setupMenu() {
-    //    val menuBar = bar(
-    //      menu("File",
-    //        item("New", newDictionaryAction),
-    //        item("Save", saveAction),
-    //        item("Save as", saveAsAction))).peer
-    //    setJMenuBar(menuBar)
-    val menuBar = new JMenuBar()
+    import info.daviot.scala.swing.MenuCreation._
     saveAction.setEnabled(false)
-    menuBar.add(new JButton(newDictionaryAction))
-    menuBar.add(Box.createGlue())
-    menuBar.add(new JButton(helpAction))
-    menuBar.add(new JButton(loadAction))
-    menuBar.add(new JButton(saveAction))
-    menuBar.add(new JButton(saveAsAction))
-    menuBar.add(new JButton(importAction))
-    menuBar.add(new JButton(exportAction))
-    menuBar.add(Box.createGlue())
-    menuBar.add(new JButton(trainingAction))
-    menuBar.add(Box.createGlue())
-    menuBar.add(new JButton(printAction))
-    menuBar.add(Box.createGlue())
-    setJMenuBar(menuBar)
+    menuBar = bar(
+      menu("File",
+        item("Nouveau dictionnaire", newDictionaryClicked),
+        item("Charger", loadClicked),
+        item("Enregistrer", save),
+        item("Enregistrer sous", saveAsClicked),
+        item("Importer", importClicked),
+        item("Exporter", exportClicked),
+        item("Imprimer", {})),
+      menu("Entrainement", item("Nouvel entrainement", runTraining)))
   }
 
   private def setupListeners() {
-    searchField.getDocument().addDocumentListener(new DocumentListener() {
-      def insertUpdate(e: DocumentEvent) { Swing.onEDT(updateList) }
-      def removeUpdate(e: DocumentEvent) { Swing.onEDT(updateList) }
-      def changedUpdate(e: DocumentEvent) { Swing.onEDT(updateList) }
-    })
+    searchField.reactions += {
+      case ValueChanged(_) => Swing.onEDT(updateList)
+    }
     wordsList.addListSelectionListener(new ListSelectionListener() {
       def valueChanged(e: ListSelectionEvent) {
         if (!e.getValueIsAdjusting())
           listSelectionChanged(getSelectedWord())
       }
     })
-    newButton.addActionListener(new ActionListener() {
-      def actionPerformed(e: ActionEvent) {
-        newButtonClicked()
-      }
-    })
-    helpButton.addActionListener(new ActionListener() {
-      def actionPerformed(e: ActionEvent) {
-        showHelp()
-      }
-    })
-    deleteButton.addActionListener(new ActionListener() {
-      def actionPerformed(e: ActionEvent) {
-        deleteButtonClicked()
-      }
-    })
-    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
-    addWindowListener(new WindowAdapter() {
-      override def windowClosing(e: WindowEvent) {
+    newButton.reactions += { case ButtonClicked(_) => newButtonClicked() }
+    helpButton.reactions += { case ButtonClicked(_) => showHelp() }
+    deleteButton.reactions += { case ButtonClicked(_) => deleteButtonClicked }
+    reactions += {
+      case WindowClosing(_) =>
         if (checkAndSave("Sauver avant de quitter ?", "Attention"))
           dispose()
-      }
-    })
+    }
+    //    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
+    //    addWindowListener(new WindowAdapter() {
+    //      override def windowClosing(e: WindowEvent) {
+    //      }
+    //    })
   }
 
   private def listSelectionChanged(selectedWord: String) {
     if (selectedWord != null && selectedWord.length() > 0) {
       if (entryPanel.modified && lastSelectedWord != null
         && !selectedWord.equals(lastSelectedWord)) {
-        val response = JOptionPane.showConfirmDialog(this,
+        val response = JOptionPane.showConfirmDialog(peer,
           "Les données ont été modifiées",
           "Conserver les modifications ?",
           JOptionPane.YES_NO_CANCEL_OPTION,
@@ -509,20 +483,21 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
     lastSelectedWord = selectedWord
   }
 
-  lazy val leftPanel: JPanel = {
-    val panel = new JPanel(new BorderLayout())
-    val topBox = Box.createHorizontalBox()
-    topBox.add(newButton)
-    topBox.add(Box.createHorizontalStrut(10))
-    topBox.add(deleteButton)
-    topBox.add(Box.createHorizontalStrut(10))
-    topBox.add(new JLabel("Rechercher "))
-    topBox.add(searchField)
-    panel.add(topBox, BorderLayout.NORTH)
+  lazy val leftPanel = new BorderPanel {
+    val topBox = new BoxPanel(Orientation.Horizontal) {
+      contents += newButton
+      contents += Swing.HStrut(10)
+      contents += deleteButton
+      contents += Swing.HStrut(10)
+      contents += new Label("Rechercher ")
+      contents += searchField
+    }
+    add(topBox, BorderPanel.Position.North)
     wordsList.setFont(DictionaryConstants.FONT)
-    panel.add(new JScrollPane(wordsList.asInstanceOf[Component]), BorderLayout.CENTER)
-    panel.add(languageSelector, BorderLayout.SOUTH)
-    panel
+    add(new ScrollPane(Component.wrap(wordsList)), BorderPanel.Position.Center)
+    setSelector(Component.wrap(languageSelector))
+
+    def setSelector(selector: Component) { add(selector, BorderPanel.Position.South) }
   }
 
   def deleteButtonClicked() {
@@ -555,7 +530,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
 
   private def updateList() {
     val listData = new ArrayList[String](dictionary.getSortedEntries(firstLanguageSelected))
-    var searchFilter = searchField.getText().trim()
+    var searchFilter = searchField.text.trim()
     if (searchFilter.length() > 0) {
       searchFilter = ".*" + searchFilter + ".*"
       val i = listData.iterator()
@@ -591,9 +566,9 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
 
   def newDictionaryClicked() {
     if (checkAndSave("Attention aux donnèes en cours", "Sauver les données en cours ?")) {
-      val firstLanguage = JOptionPane.showInputDialog(this, "Première langue ?", null, JOptionPane.INFORMATION_MESSAGE,
+      val firstLanguage = JOptionPane.showInputDialog(peer, "Première langue ?", null, JOptionPane.INFORMATION_MESSAGE,
         null, Locale.getISOLanguages().asInstanceOf[Array[Object]], "fr").asInstanceOf[String]
-      val secondLanguage = JOptionPane.showInputDialog(this,
+      val secondLanguage = JOptionPane.showInputDialog(peer,
         "Deuxième langue ?", null, JOptionPane.INFORMATION_MESSAGE,
         null, Locale.getISOLanguages().asInstanceOf[Array[Object]], "en").asInstanceOf[String]
       dictionary = new TwoWayDictionary(firstLanguage, secondLanguage)
@@ -606,7 +581,7 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
       Desktop.getDesktop().browse(new URI(HELP_PAGE))
     } catch {
       case e: Exception =>
-        new ErrorMessageDialog(this, "Impossible d'ouvrir l'aide",
+        new ErrorMessageDialog(peer, "Impossible d'ouvrir l'aide",
           "Impossible d'ouvrir l'adresse " + HELP_PAGE, e)
           .setVisible(true)
     }
@@ -620,11 +595,10 @@ class DictionaryFrame extends JFrame with SaveBeforeLoseModifications {
     updateList
     pack
     updateStatus
-    setVisible(true)
+    visible = true
     updateTitle
-    leftPanel.remove(languageSelector)
     languageSelector = buildSelector
-    leftPanel.add(languageSelector, BorderLayout.SOUTH)
+    leftPanel.setSelector(Component.wrap(languageSelector))
   }
 }
 
@@ -632,11 +606,9 @@ object DictionaryFrame extends SimpleSwingApplication {
   val propertiesFileName = System.getProperty("user.home") + "/dict.properties"
   UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
 
-  override val top = new Frame {
-    override lazy val peer = new DictionaryFrame with InterfaceMixin
-    pack
-  }
-  top.peer.load(new File(readPropertiesFile()))
+  override val top = new DictionaryFrame
+  top.pack
+  top.load(new File(readPropertiesFile()))
 
   //  val frame = new DictionaryFrame("Français", "Español")
   // frame.addEntry("hola", "salut, bonjour", "Hola se�or")

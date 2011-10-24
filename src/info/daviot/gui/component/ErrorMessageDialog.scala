@@ -68,11 +68,13 @@ class ErrorMessageDialog(frame: Frame, title: String, message: String, exception
 
   private def throwableToString(exception: Throwable): String = {
     if (exception == null)
-       ""
-    val stringWriter = new StringWriter()
-    val printWriter = new PrintWriter(stringWriter)
-    exception.printStackTrace(printWriter)
-    printWriter.flush()
-     stringWriter.toString()
+      ""
+    else {
+      val stringWriter = new StringWriter()
+      val printWriter = new PrintWriter(stringWriter)
+      exception.printStackTrace(printWriter)
+      printWriter.flush()
+      stringWriter.toString()
+    }
   }
 }

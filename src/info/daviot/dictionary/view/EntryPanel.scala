@@ -133,7 +133,7 @@ class EntryPanel(frame: DictionaryFrame) extends JPanel {
         frame.newButtonClicked()
       }
     } else
-      new ErrorMessageDialog(frame, "Erreur dans les champs", validation.toString).setVisible(true)
+      new ErrorMessageDialog(frame.peer, "Erreur dans les champs", validation.toString).setVisible(true)
   }
 
 }
