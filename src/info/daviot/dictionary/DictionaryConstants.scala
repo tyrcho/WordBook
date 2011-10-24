@@ -1,9 +1,8 @@
 package info.daviot.dictionary
 
-import info.daviot.gui.component.JTextField
-
 import java.awt.Font
 import java.nio.charset.Charset
+import javax.swing.JTextField
 
 object DictionaryConstants {
   val CHARSET = Charset.forName("UTF-8")

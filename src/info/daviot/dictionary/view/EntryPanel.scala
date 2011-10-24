@@ -3,104 +3,76 @@ package info.daviot.dictionary.view
 import info.daviot.dictionary.DictionaryConstants
 import info.daviot.dictionary.model.DictionaryEntry
 import info.daviot.gui.component.ErrorMessageDialog
-import info.daviot.gui.component.JTextField
 import info.daviot.gui.field.DefaultInputFieldGroup
 import info.daviot.gui.field.IInputFieldGroup
 import info.daviot.gui.field.ITextField
 import info.daviot.util.validation._
-
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.util.Iterator
-
-import javax.swing.BoxLayout
-import javax.swing.JButton
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.JTextArea
+import javax.swing._
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import scala.swing._
+import scala.swing.event._
 
-class EntryPanel(frame: DictionaryFrame) extends JPanel {
+class EntryPanel(frame: DictionaryFrame) extends BoxPanel(Orientation.Vertical) {
   val TRANSLATIONS_FIELD = "translations"
   val WORD_FIELD = "word"
-  val wordLabel = new JLabel()
-  val translationLabel = new JLabel()
-  val wordTextField = new JTextField()
-  val translationsTextField = new JTextField()
-  val explainationTextArea = new JTextArea(4, 20)
-  val okButton = new JButton("Valider")
+  val wordLabel = new Label()
+  val translationLabel = new Label()
+  val wordTextField = new TextField()
+  val translationsTextField = new TextField()
+  val explainationTextArea = new TextArea(4, 20)
+  val okButton = new Button("Valider")
 
   var modified = false
   var previousWord: String = _
 
-  wordTextField.setFont(DictionaryConstants.FONT)
-  translationsTextField.setFont(DictionaryConstants.FONT)
+  wordTextField.font = DictionaryConstants.FONT
+  translationsTextField.font = DictionaryConstants.FONT
   val inputFields = Map(WORD_FIELD -> wordTextField, TRANSLATIONS_FIELD -> translationsTextField)
   val fieldsValidator = new GroupValidator(Map(
     WORD_FIELD -> new NotEmptyValidator("Le mot doit être rempli"),
-    WORD_FIELD -> new PatternValidator("[^,]+", "Le mot ne doit pas contenir de virgule", false),
+    WORD_FIELD -> new PatternValidator("[^,]+", "Le mot ne doit pas contenir de virgule", true),
     TRANSLATIONS_FIELD -> new NotEmptyValidator("La traduction doit être remplie")))
-  setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
-  add(wordLabel)
-  add(wordTextField)
-  add(translationLabel)
-  add(translationsTextField)
-  add(new JLabel("Exemple ou explication :"))
-  add(new JScrollPane(explainationTextArea))
-  add(okButton)
-  okButton.addActionListener(new ActionListener() {
-    def actionPerformed(e: ActionEvent) {
-      okButtonClicked()
-    }
-  })
-  wordTextField.setDefaultButton(okButton)
-  translationsTextField.setDefaultButton(okButton)
-  explainationTextArea.setWrapStyleWord(true)
-  explainationTextArea.setLineWrap(true)
+  contents += wordLabel
+  contents += wordTextField
+  contents += translationLabel
+  contents += translationsTextField
+  contents += new Label("Exemple ou explication :")
+  contents += new ScrollPane(explainationTextArea)
+  contents += okButton
+  okButton.reactions += { case ButtonClicked(_) => okButtonClicked }
+  Seq(wordTextField, translationsTextField) foreach
+    (_.keys.reactions += { case KeyPressed(_, Key.Enter, _, _) => okButtonClicked })
+  explainationTextArea.peer.setWrapStyleWord(true)
+  explainationTextArea.peer.setLineWrap(true)
   setupListeners()
 
   private def setupListeners() {
-    val listener = new DocumentListener() {
-      def insertUpdate(e: DocumentEvent) {
-        modified = true
-      }
-
-      def removeUpdate(e: DocumentEvent) {
-        modified = true
-      }
-
-      def changedUpdate(e: DocumentEvent) {
-        modified = true
-      }
-    }
-    wordTextField.getDocument().addDocumentListener(listener)
-    translationsTextField.getDocument().addDocumentListener(listener)
-    explainationTextArea.getDocument().addDocumentListener(listener)
+    Seq(wordTextField, translationsTextField, explainationTextArea) foreach
+      (_.reactions += { case ValueChanged(_) => modified = true })
   }
 
   override def requestFocus() {
     wordTextField.requestFocus()
   }
 
-  override def setEnabled(enabled: Boolean) {
-    wordTextField.setEnabled(enabled)
-    translationsTextField.setEnabled(enabled)
-    explainationTextArea.setEnabled(enabled)
-    okButton.setEnabled(enabled)
+  def setEnabled(enabled: Boolean) {
+    Seq(wordTextField, translationsTextField, explainationTextArea, okButton) foreach
+      (_.enabled = enabled)
   }
 
   def clear() {
-    wordTextField.setText("")
-    translationsTextField.setText("")
-    explainationTextArea.setText("")
+    Seq(wordTextField, translationsTextField, explainationTextArea) foreach
+      (_.text = "")
     modified = false
     previousWord = null
   }
 
   def setDictionaryEntry(selectedWord: String, entry: DictionaryEntry) {
-    wordTextField.setText(selectedWord)
+    wordTextField.text = selectedWord
     val translations = new StringBuffer()
     val i = entry.translations.iterator()
     while (i.hasNext()) {
@@ -108,27 +80,26 @@ class EntryPanel(frame: DictionaryFrame) extends JPanel {
       if (i.hasNext())
         translations.append(", ")
     }
-    translationsTextField.setText(translations.toString())
-    explainationTextArea.setText(entry.explaination)
+    translationsTextField.text = translations.toString
+    explainationTextArea.text = entry.explaination
     modified = false
     previousWord = selectedWord
   }
 
   def setLanguages(first: String, second: String) {
-    wordLabel.setText("Mot en " + first)
-    translationLabel.setText("Traduction(s) en " + second)
+    wordLabel.text = "Mot en " + first
+    translationLabel.text = "Traduction(s) en " + second
   }
 
   def okButtonClicked() {
-    val valuesMap = inputFields map (kv => (kv._1, kv._2.getCurrentValue()))
+    val valuesMap = inputFields map { case (key, field) => (key, field.text) }
     val validation = fieldsValidator.validate(valuesMap)
     if (validation.isEmpty) {
-      val word = wordTextField.getText().trim()
-      val translations = translationsTextField.getText().trim()
+      val word = wordTextField.text.trim
+      val translations = translationsTextField.text.trim
       if (word.length() > 0 && translations.length() > 0) {
         modified = false
-        frame.addEntry(previousWord, word, translations,
-          explainationTextArea.getText())
+        frame.addEntry(previousWord, word, translations, explainationTextArea.text)
         frame.modified = true
         frame.newButtonClicked()
       }

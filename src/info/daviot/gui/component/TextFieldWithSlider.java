@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -53,7 +54,7 @@ public class TextFieldWithSlider extends JPanel {
 			}
 		});
 	}
-	
+
 	public void addChangeListener(ChangeListener cl) {
 		jSlider.addChangeListener(cl);
 	}

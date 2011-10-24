@@ -9,9 +9,10 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.PrintWriter
 import java.io.StringWriter
-
 import javax.swing.Box
 import javax.swing.JButton
+import javax.swing.JTextArea
+import javax.swing.JScrollPane
 
 class ErrorMessageDialog(frame: Frame, title: String, message: String, exception: Throwable = null) extends InformationDialog(frame, title) {
 
@@ -44,7 +45,7 @@ class ErrorMessageDialog(frame: Frame, title: String, message: String, exception
         detailsButton.setText("Details>>")
         pack()
       } else {
-        detailsScrollPane.scrollToBeginning()
+        detailsScrollPane.getVerticalScrollBar().setValue(0)
         detailsScrollPane.setVisible(true)
         detailsButton.setText("Details<<")
         pack()

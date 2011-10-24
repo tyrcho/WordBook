@@ -400,7 +400,7 @@ class DictionaryFrame extends Frame with SaveBeforeLoseModifications {
       add(splitPane, BorderPanel.Position.Center)
       add(statusBar, BorderPanel.Position.South)
       splitPane.leftComponent = leftPanel
-      splitPane.rightComponent = Component.wrap(entryPanel)
+      splitPane.rightComponent = entryPanel
       entryPanel.setEnabled(false)
 
       SwingUtilities.invokeLater(new Runnable() {
